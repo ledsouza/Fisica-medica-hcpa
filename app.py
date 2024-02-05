@@ -59,9 +59,13 @@ except Exception as e:
 
 # Creating a forgot password widget
 try:
-    username_of_forgotten_password, email_of_forgotten_password, new_random_password = authenticator.forgot_password()
+    username_of_forgotten_password, email_of_forgotten_password, new_random_password = authenticator.forgot_password(fields={
+        'Form name': 'Esquecimento de senha',
+        'Username': 'Usuário',
+        'Submit': 'Submeter'
+    })
     if username_of_forgotten_password:
-        st.success('New password sent securely')
+        st.success('Nova senha enviada com sucesso!')
         # Random password to be transferred to the user securely
     elif username_of_forgotten_password == False:
         st.error('Username not found')
