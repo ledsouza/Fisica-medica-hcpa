@@ -90,8 +90,15 @@ except Exception as e:
 # Creating an update user details widget
 if st.session_state["authentication_status"]:
     try:
-        if authenticator.update_user_details(st.session_state["username"]):
-            st.success('Entries updated successfully')
+        if authenticator.update_user_details(st.session_state["username"], fields={
+            'Form name': 'Atualizar detalhes do usuário',
+            'Field': 'Campo',
+            'Name': 'Nome',
+            'Email': 'Email',
+            'New value': 'Novo valor',
+            'Update': 'Atualizar'
+        }):
+            st.success('Campos atualizados com sucesso!')
     except Exception as e:
         st.error(e)
 
