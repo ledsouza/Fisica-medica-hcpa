@@ -68,18 +68,22 @@ try:
         st.success('Nova senha enviada com sucesso!')
         # Random password to be transferred to the user securely
     elif username_of_forgotten_password == False:
-        st.error('Username not found')
+        st.error('Usuário não encontrado')
 except Exception as e:
     st.error(e)
 
 # Creating a forgot username widget
 try:
-    username_of_forgotten_username, email_of_forgotten_username = authenticator.forgot_username()
+    username_of_forgotten_username, email_of_forgotten_username = authenticator.forgot_username(fields={
+        'Form name': 'Esquecimento de usuário',
+        'Email': 'Email',
+        'Submit': 'Submeter'
+    })
     if username_of_forgotten_username:
-        st.success('Username sent securely')
+        st.success('Usuário enviado com sucesso!')
         # Username to be transferred to the user securely
     elif username_of_forgotten_username == False:
-        st.error('Email not found')
+        st.error('Email não encontrado')
 except Exception as e:
     st.error(e)
 
