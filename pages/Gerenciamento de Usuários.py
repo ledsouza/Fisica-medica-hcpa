@@ -31,12 +31,10 @@ def login_widget() -> None:
 login_widget()
     
 if st.session_state["authentication_status"]:
-    reset_password, new_user, forgot_password, forgot_username, update_user = st.tabs(
+    reset_password, new_user, update_user = st.tabs(
         [
             "Redefinir senha",
             "Registrar usuário",
-            "Esqueci minha senha",
-            "Esqueci meu usuário",
             "Atualizar detalhes do usuário"
         ]
     )
@@ -82,47 +80,47 @@ if st.session_state["authentication_status"]:
         except Exception as e:
             st.error(e)
 
-    # Creating a forgot password widget
-    with forgot_password:
-        try:
-            (
-                username_of_forgotten_password,
-                email_of_forgotten_password,
-                new_random_password,
-            ) = st.session_state['authenticator'].forgot_password(
-                fields={
-                    "Form name": "Esqueci minha senha",
-                    "Username": "Usuário",
-                    "Submit": "Submeter",
-                }
-            )
-            if username_of_forgotten_password:
-                st.success("Nova senha enviada por e-mail com sucesso!")
-                # Random password to be transferred to the user securely
-            elif username_of_forgotten_password == False:
-                st.error("Usuário não encontrado")
-        except Exception as e:
-            st.error(e)
+    # # Creating a forgot password widget
+    # with forgot_password:
+    #     try:
+    #         (
+    #             username_of_forgotten_password,
+    #             email_of_forgotten_password,
+    #             new_random_password,
+    #         ) = st.session_state['authenticator'].forgot_password(
+    #             fields={
+    #                 "Form name": "Esqueci minha senha",
+    #                 "Username": "Usuário",
+    #                 "Submit": "Submeter",
+    #             }
+    #         )
+    #         if username_of_forgotten_password:
+    #             st.success("Nova senha enviada por e-mail com sucesso!")
+    #             # Random password to be transferred to the user securely
+    #         elif username_of_forgotten_password == False:
+    #             st.error("Usuário não encontrado")
+    #     except Exception as e:
+    #         st.error(e)
 
-    # Creating a forgot username widget
-    with forgot_username:
-        try:
-            username_of_forgotten_username, email_of_forgotten_username = (
-                st.session_state['authenticator'].forgot_username(
-                    fields={
-                        "Form name": "Esqueci meu usuário",
-                        "Email": "Email",
-                        "Submit": "Submeter",
-                    }
-                )
-            )
-            if username_of_forgotten_username:
-                st.success("Usuário enviado por e-mail com sucesso!")
-                # Username to be transferred to the user securely
-            elif username_of_forgotten_username == False:
-                st.error("Email não encontrado")
-        except Exception as e:
-            st.error(e)
+    # # Creating a forgot username widget
+    # with forgot_username:
+    #     try:
+    #         username_of_forgotten_username, email_of_forgotten_username = (
+    #             st.session_state['authenticator'].forgot_username(
+    #                 fields={
+    #                     "Form name": "Esqueci meu usuário",
+    #                     "Email": "Email",
+    #                     "Submit": "Submeter",
+    #                 }
+    #             )
+    #         )
+    #         if username_of_forgotten_username:
+    #             st.success("Usuário enviado por e-mail com sucesso!")
+    #             # Username to be transferred to the user securely
+    #         elif username_of_forgotten_username == False:
+    #             st.error("Email não encontrado")
+    #     except Exception as e:
+    #         st.error(e)
 
     # Creating an update user details widget
     with update_user:
