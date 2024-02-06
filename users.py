@@ -4,6 +4,15 @@ import yaml
 from yaml.loader import SafeLoader
 import time
 
+class Users:
+    def __init__(self):
+        self.authenticator, self.config = self.login_widget()
+        
+    def open_config(self) -> dict:
+        with open(".streamlit/config.yaml") as file:
+            config = yaml.load(file, Loader=SafeLoader)
+        return config
+
 def login_widget() -> tuple:
     
     # Opening the config file with the credentials

@@ -40,25 +40,25 @@ elif st.session_state["authentication_status"] is None:
 elif st.session_state["authentication_status"]:
     authenticator.logout("Logout", "sidebar")
     
-    reset_password, new_user, update_user = st.tabs(
-        [
-            "Redefinir senha",
-            "Registrar usuário",
-            "Atualizar detalhes do usuário"
-        ]
-    )
+    # reset_password, new_user, update_user = st.tabs(
+    #     [
+    #         "Redefinir senha",
+    #         "Registrar usuário",
+    #         "Atualizar detalhes do usuário"
+    #     ]
+    # )
 
-    # Creating a password reset widget
-    with reset_password:
-        reset_password_widget(authenticator)
+    # # Creating a password reset widget
+    # with reset_password:
+    #     reset_password_widget(authenticator)
 
-    # Creating a new user registration widget
-    with new_user:
-        new_user_widget(authenticator)
+    # # Creating a new user registration widget
+    # with new_user:
+    #     new_user_widget(authenticator)
 
-    # Creating an update user details widget
-    with update_user:
-        update_user_widget(authenticator)
+    # # Creating an update user details widget
+    # with update_user:
+    #     update_user_widget(authenticator)
 
     # # Saving config file
     # with open(".streamlit/config.yaml", "w") as file:
