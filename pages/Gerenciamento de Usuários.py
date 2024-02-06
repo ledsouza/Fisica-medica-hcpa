@@ -2,35 +2,72 @@ import streamlit as st
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
+import time
 
 # Functions
-def login_widget() -> None:
-    
-    # Opening the config file with the credentials
-    with open(".streamlit/config.yaml") as file:
-        config = yaml.load(file, Loader=SafeLoader)
 
-    authenticator = stauth.Authenticate(
-        config["credentials"],
-        config["cookie"]["name"],
-        config["cookie"]["key"],
-        config["cookie"]["expiry_days"],
-        config["preauthorized"],
-    )
-    st.session_state['authenticator'] = authenticator
-    st.session_state['config'] = config
-
-    # Creating a login widget
+def forgot_password_widget():
     try:
-        authenticator.login(fields={"Username": "Usuário", "Password": "Senha"})
-        authenticator.logout("Logout", "sidebar")
+        (
+            username_of_forgotten_password,
+            email_of_forgotten_password,
+            new_random_password,
+        ) = authenticator.forgot_password(
+            fields={
+                "Form name": "Esqueci minha senha",
+                "Username": "Usuário",
+                "Submit": "Submeter",
+            }
+        )
+        if username_of_forgotten_password:
+            st.session_state.clicked = False
+            st.success("Nova senha enviada por e-mail com sucesso!")
+            time.sleep(1)
+            st.rerun()
+        elif username_of_forgotten_password == False:
+            st.error("Usuário não encontrado")
     except Exception as e:
         st.error(e)
-
-# App
-login_widget()
     
-if st.session_state["authentication_status"]:
+# App
+
+if 'clicked' not in st.session_state:
+        st.session_state.clicked = False
+        
+def click_button():
+    st.session_state.clicked = True
+
+# Opening the config file with the credentials
+with open(".streamlit/config.yaml") as file:
+    config = yaml.load(file, Loader=SafeLoader)
+
+authenticator = stauth.Authenticate(
+    config["credentials"],
+    config["cookie"]["name"],
+    config["cookie"]["key"],
+    config["cookie"]["expiry_days"],
+    config["preauthorized"],
+)
+
+# Creating a login widget
+try:
+    _, authentication_status, _ = authenticator.login(fields={"Username": "Usuário", "Password": "Senha"})
+except Exception as e:
+    st.error(e)
+    
+if authentication_status == False:
+    st.error("Usuário ou senha incorreto")
+    
+if authentication_status == None:
+    st.warning("Por favor, insira o usuário e a senha")
+        
+if authentication_status == False or authentication_status == None:           
+    st.button('Esqueceu a senha?', type='primary', key='forgot_password', on_click=click_button)
+    if st.session_state.clicked:
+        forgot_password_widget()
+    
+if authentication_status:
+    authenticator.logout("Logout", "sidebar")
     reset_password, new_user, update_user = st.tabs(
         [
             "Redefinir senha",
@@ -41,21 +78,20 @@ if st.session_state["authentication_status"]:
 
     # Creating a password reset widget
     with reset_password:
-        if st.session_state["authentication_status"]:
-            try:
-                if st.session_state['authenticator'].reset_password(
-                    st.session_state["username"],
-                    fields={
-                        "Form name": "Redefinir senha",
-                        "Current password": "Senha atual",
-                        "New password": "Nova senha",
-                        "Repeat password": "Repetir senha",
-                        "Reset": "Redefinir",
-                    },
-                ):
-                    st.success("Senha modificada com sucesso!")
-            except Exception as e:
-                st.error(e)
+        try:
+            if authenticator.reset_password(
+                st.session_state["username"],
+                fields={
+                    "Form name": "Redefinir senha",
+                    "Current password": "Senha atual",
+                    "New password": "Nova senha",
+                    "Repeat password": "Repetir senha",
+                    "Reset": "Redefinir",
+                },
+            ):
+                st.success("Senha modificada com sucesso!")
+        except Exception as e:
+            st.error(e)
 
     # Creating a new user registration widget
     with new_user:
@@ -64,7 +100,7 @@ if st.session_state["authentication_status"]:
                 email_of_registered_user,
                 username_of_registered_user,
                 name_of_registered_user,
-            ) = st.session_state['authenticator'].register_user(
+            ) = authenticator.register_user(
                 preauthorization=False,
                 fields={
                     "Form name": "Registrar usuário",
@@ -80,33 +116,11 @@ if st.session_state["authentication_status"]:
         except Exception as e:
             st.error(e)
 
-    # # Creating a forgot password widget
-    # with forgot_password:
-    #     try:
-    #         (
-    #             username_of_forgotten_password,
-    #             email_of_forgotten_password,
-    #             new_random_password,
-    #         ) = st.session_state['authenticator'].forgot_password(
-    #             fields={
-    #                 "Form name": "Esqueci minha senha",
-    #                 "Username": "Usuário",
-    #                 "Submit": "Submeter",
-    #             }
-    #         )
-    #         if username_of_forgotten_password:
-    #             st.success("Nova senha enviada por e-mail com sucesso!")
-    #             # Random password to be transferred to the user securely
-    #         elif username_of_forgotten_password == False:
-    #             st.error("Usuário não encontrado")
-    #     except Exception as e:
-    #         st.error(e)
-
     # # Creating a forgot username widget
     # with forgot_username:
     #     try:
     #         username_of_forgotten_username, email_of_forgotten_username = (
-    #             st.session_state['authenticator'].forgot_username(
+    #             authenticator.forgot_username(
     #                 fields={
     #                     "Form name": "Esqueci meu usuário",
     #                     "Email": "Email",
@@ -124,23 +138,22 @@ if st.session_state["authentication_status"]:
 
     # Creating an update user details widget
     with update_user:
-        if st.session_state["authentication_status"]:
-            try:
-                if st.session_state['authenticator'].update_user_details(
-                    st.session_state["username"],
-                    fields={
-                        "Form name": "Atualizar detalhes do usuário",
-                        "Field": "Campo",
-                        "Name": "Nome",
-                        "Email": "Email",
-                        "New value": "Novo valor",
-                        "Update": "Atualizar",
-                    },
-                ):
-                    st.success("Campos atualizados com sucesso!")
-            except Exception as e:
-                st.error(e)
+        try:
+            if authenticator.update_user_details(
+                st.session_state["username"],
+                fields={
+                    "Form name": "Atualizar detalhes do usuário",
+                    "Field": "Campo",
+                    "Name": "Nome",
+                    "Email": "Email",
+                    "New value": "Novo valor",
+                    "Update": "Atualizar",
+                },
+            ):
+                st.success("Campos atualizados com sucesso!")
+        except Exception as e:
+            st.error(e)
 
-    # Saving config file
-    with open(".streamlit/config.yaml", "w") as file:
-        yaml.dump(st.session_state['config'], file, default_flow_style=False)
+    # # Saving config file
+    # with open(".streamlit/config.yaml", "w") as file:
+    #     yaml.dump(config, file, default_flow_style=False)
