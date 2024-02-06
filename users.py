@@ -120,7 +120,8 @@ def new_user_widget(authenticator) -> None:
                 "Email is not valid": "Email não é válido!",
                 "Email already taken": "Email já registrado!",
                 "Username is not valid": "Usuário não é válido!",
-                "Name is not valid": "Nome não é válido!"
+                "Name is not valid": "Nome não é válido!",
+                "Email not allowed to register": "Email não permitido para registro!"
             }
         error_message = error_messages.get(str(e), str(e))
         st.error(error_message)
@@ -145,7 +146,8 @@ def update_user_widget(authenticator) -> None:
                 "New value not provided": "Novo valor não fornecido!",
                 "Email is not valid": "Email não é válido!",
                 "Email already taken": "Email já registrado!",
-                "Name is not valid": "Nome não é válido!"
+                "Name is not valid": "Nome não é válido!",
+                "New and current values are the same": "Novo e valor atual são iguais!"
             }
         error_message = error_messages.get(str(e), str(e))
         st.error(error_message)
