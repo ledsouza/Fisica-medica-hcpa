@@ -40,8 +40,6 @@ elif st.session_state["authentication_status"] is None:
 elif st.session_state["authentication_status"]:
     authenticator.logout("Logout", "sidebar")
     
-    st.write('Usuário autenticado com sucesso!')
-    
     reset_password, new_user, update_user = st.tabs(
         [
             "Redefinir senha",
