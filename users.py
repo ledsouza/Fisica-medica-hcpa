@@ -84,7 +84,13 @@ def reset_password_widget(authenticator) -> None:
         ):
             st.success("Senha modificada com sucesso!")
     except Exception as e:
-        st.error(e)
+        error_messages = {
+            "Password/repeat password fields cannot be empty": "Senha e repetição de senha não podem estar vazios!",
+            "Passwords do not match": "Senhas não coincidem!",
+            "Current password is incorrect": "Senha atual incorreta!"
+        }
+        error_message = error_messages.get(str(e), str(e))
+        st.error(error_message)
         
 def new_user_widget(authenticator) -> None:
     try:
@@ -108,7 +114,16 @@ def new_user_widget(authenticator) -> None:
         if email_of_registered_user:
             st.success("Usuário registrado com sucesso!")
     except Exception as e:
-        st.error(e)
+        error_messages = {
+                "Password/repeat password fields cannot be empty": "Senha e repetição de senha não podem estar vazios!",
+                "Passwords do not match": "Senhas não coincidem!",
+                "Email is not valid": "Email não é válido!",
+                "Email already taken": "Email já registrado!",
+                "Username is not valid": "Usuário não é válido!",
+                "Name is not valid": "Nome não é válido!"
+            }
+        error_message = error_messages.get(str(e), str(e))
+        st.error(error_message)
         
 def update_user_widget(authenticator) -> None:
     try:
@@ -125,4 +140,12 @@ def update_user_widget(authenticator) -> None:
         ):
             st.success("Campos atualizados com sucesso!")
     except Exception as e:
-        st.error(e)
+        error_messages = {
+                "Field cannot be empty": "Campo não pode estar vazio!",
+                "New value not provided": "Novo valor não fornecido!",
+                "Email is not valid": "Email não é válido!",
+                "Email already taken": "Email já registrado!",
+                "Name is not valid": "Nome não é válido!"
+            }
+        error_message = error_messages.get(str(e), str(e))
+        st.error(error_message)
