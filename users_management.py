@@ -12,6 +12,7 @@ class UsersManagement:
     def _open_config(self) -> dict:
         with open(".streamlit/config.yaml") as file:
             config = yaml.load(file, Loader=SafeLoader)
+            st.session_state['authenticated_usernames'] = config['credentials']['usernames']
         return config
     
     def _build_authenticator(self) -> stauth.Authenticate:
@@ -22,17 +23,18 @@ class UsersManagement:
             self.config["cookie"]["expiry_days"],
             self.config["preauthorized"],
         )
+        st.session_state['authenticator'] = authenticator
         return authenticator
 
     def login_widget(self) -> None:
         try:
-            self.authenticator.login(fields={"Username": "Usuário", "Password": "Senha"})
+            self.authenticator.login(fields={"Form name": "Log in","Username": "Usuário", "Password": "Senha"})
         except Exception as e:
             st.error(e)
             
     def logout_widget(self) -> None:
         try:
-            self.authenticator.logout("Logout", "sidebar")
+            self.authenticator.logout("Log out", "sidebar")
         except Exception as e:
             st.error(e)
 
