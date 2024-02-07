@@ -85,6 +85,9 @@ if bi_data is not None:
     ]
     
     cleaned_bi = cleaned_bi.query('`Atividade Administrada` > 10.0')
+    cleaned_bi = cleaned_bi.query('`Peso (kg)` < 150.0 and `Peso (kg)` > 10.0')
+    
+    cleaned_bi['Nome do produto'] = cleaned_bi['Nome do produto'].str.replace('Tc-99m', '99mTc-MDP')
     
     tableviz_bi = cleaned_bi.copy()
     tableviz_bi['Data'] = tableviz_bi['Data'].dt.strftime('%d/%m/%Y')
