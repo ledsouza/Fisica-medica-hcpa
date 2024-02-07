@@ -8,6 +8,7 @@ class UsersManagement:
     def __init__(self):
         self.config = self._open_config()
         self.authenticator = self._build_authenticator()
+        st.session_state['user_management'] = self
         
     def _open_config(self) -> dict:
         with open(".streamlit/config.yaml") as file:
@@ -23,7 +24,6 @@ class UsersManagement:
             self.config["cookie"]["expiry_days"],
             self.config["preauthorized"],
         )
-        st.session_state['authenticator'] = authenticator
         return authenticator
 
     def login_widget(self) -> None:
