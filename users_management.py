@@ -4,7 +4,7 @@ import yaml
 from yaml.loader import SafeLoader
 import time
 
-class Users:
+class UsersManagement:
     def __init__(self):
         self.config = self._open_config()
         self.authenticator = self._build_authenticator()
