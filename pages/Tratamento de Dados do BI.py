@@ -1,9 +1,7 @@
 import streamlit as st
-import streamlit_authenticator as stauth
 import pandas as pd
 import re
 import plotly.graph_objects as go
-import xlsxwriter
 from io import BytesIO
 
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
