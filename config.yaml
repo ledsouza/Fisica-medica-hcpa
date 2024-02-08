@@ -10,10 +10,10 @@ credentials:
       name: Leandro Souza
       password: $2b$12$n0pLYqh/6rbGnP8EOZwUu.wimJuW0MOlZYjOLasUu2IKXX2XjJlOG
     teste:
-      email: teste2@hcpa.edu.br
+      email: teste@hcpa.edu.br
       logged_in: false
       name: teste2
-      password: $2b$12$OkJqdolc12sElUZyhAOrLOgXJuQfEFVEfUVx.ldc.atjzTXWHCjS.
+      password: $2b$12$QdAH3.8y5UQhbyVKe0Lqp.pwy45GT7WskHgIZIMNQMVgbLD/GBwIO
 preauthorized:
   emails:
   - jbsalazar@hcpa.edu.br

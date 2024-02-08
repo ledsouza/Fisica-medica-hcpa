@@ -3,15 +3,28 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 import time
+import os
+import logging
+import boto3
+from botocore.exceptions import ClientError
 
 class UsersManagement:
     def __init__(self):
         self.config = self._open_config()
+        self.config_name = 'config.yaml'
+        self.bucket = 'fisica-medica-hcpa'
         self.authenticator = self._build_authenticator()
+        
         st.session_state['user_management'] = self
+        os.environ["AWS_ACCESS_KEY_ID"] = st.secrets['s3_credentials']['access_key']
+        os.environ["AWS_SECRET_ACCESS_KEY"] = st.secrets['s3_credentials']['secret_key']
+        os.environ['AWS_DEFAULT_REGION'] = st.secrets['s3_credentials']['region']
         
     def _open_config(self) -> dict:
-        with open(".streamlit/config.yaml") as file:
+        s3 = boto3.client('s3')
+        s3.download_file('fisica-medica-hcpa', 'config.yaml', 'config.yaml')
+        
+        with open("config.yaml") as file:
             config = yaml.load(file, Loader=SafeLoader)
         return config
     
@@ -96,8 +109,11 @@ class UsersManagement:
                         "Reset": "Redefinir",
                     }
                 ):
-                    self.save_config()
-                    st.success("Senha modificada com sucesso!")
+                    upload_status = self._save_config()
+                    if upload_status:
+                        st.success("Senha modificada com sucesso!")
+                    else:
+                        st.error("Erro ao modificar senha")
             except Exception as e:
                 error_messages = {
                     "Password/repeat password fields cannot be empty": "Senha e repetição de senha não podem estar vazios!",
@@ -127,8 +143,11 @@ class UsersManagement:
                 }
             )
             if email_of_registered_user:
-                self.save_config()
-                st.success("Usuário registrado com sucesso!")
+                upload_status = self._save_config()
+                if upload_status:
+                    st.success("Usuário registrado com sucesso!")
+                else:
+                    st.error("Erro ao registrar usuário")
         except Exception as e:
             error_messages = {
                     "Password/repeat password fields cannot be empty": "Senha e repetição de senha não podem estar vazios!",
@@ -158,8 +177,11 @@ class UsersManagement:
                         "Update": "Atualizar",
                     },
                 ):
-                    self.save_config()
-                    st.success("Campos atualizados com sucesso!")
+                    upload_status = self._save_config()
+                    if upload_status:
+                        st.success("Campos atualizados com sucesso!")
+                    else:
+                        st.error("Erro ao atualizar campos")
             except Exception as e:
                 error_messages = {
                         "Field cannot be empty": "Campo não pode estar vazio!",
@@ -179,8 +201,11 @@ class UsersManagement:
             st.error('Usuário não encontrado')
         else:
             del self.config['credentials']['usernames'][username]
-            self.save_config()
-            st.success('Usuário removido com sucesso!')
+            upload_status = self._save_config()
+            if upload_status:
+                st.success('Usuário removido com sucesso!')
+            else:
+                st.error('Erro ao remover usuário')
             
     def remove_user_widget(self) -> None:   
         with st.form('remove_user'):
@@ -188,6 +213,23 @@ class UsersManagement:
             username = st.text_input('Usuário')
             st.form_submit_button('Remover', on_click=self._remove_user_submit, args=(username,))
             
-    def save_config(self) -> None:
-        with open(".streamlit/config.yaml", "w") as file:
+    def _upload_file(self):
+        """Upload a file to an S3 bucket
+        :return: True if file was uploaded, else False
+        """
+
+        # Upload the file
+        s3_client = boto3.client('s3')
+        try:
+            response = s3_client.upload_file(self.config_name, self.bucket, self.config_name)
+        except ClientError as e:
+            logging.error(e)
+            return False
+        return True
+            
+    def _save_config(self) -> bool:
+        with open("config.yaml", "w") as file:
             yaml.dump(self.config, file, default_flow_style=False)
+            
+        upload_status = self._upload_file()
+        return upload_status

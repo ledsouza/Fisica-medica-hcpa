@@ -1,6 +1,7 @@
 import streamlit as st
 from menu import menu
 from users_management import UsersManagement
+import os
 import boto3
     
 user_management = UsersManagement()
@@ -37,7 +38,5 @@ elif st.session_state["authentication_status"] is None:
     st.warning('Por favor, preencha os campos de usuário e senha.')
 else:
     st.write(f'# Bem-vindo, {st.session_state.name}!')
-    
-    
 
 menu()
