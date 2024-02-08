@@ -41,8 +41,8 @@ class UsersManagement:
         try:
             (
                 username_of_forgotten_password,
-                email_of_forgotten_password,
-                new_random_password,
+                _,
+                _,
             ) = self.authenticator.forgot_password(
                 fields={
                     "Form name": "Esqueci minha senha",
@@ -82,34 +82,37 @@ class UsersManagement:
             st.error(e)
         
     def reset_password_widget(self) -> None:
-        try:
-            if self.authenticator.reset_password(
-                st.session_state["username"],
-                fields={
-                    "Form name": "Redefinir senha",
-                    "Current password": "Senha atual",
-                    "New password": "Nova senha",
-                    "Repeat password": "Repetir senha",
-                    "Reset": "Redefinir",
+        if st.session_state['username'] == None:
+            pass
+        else:
+            try:
+                if self.authenticator.reset_password(
+                    st.session_state["username"],
+                    fields={
+                        "Form name": "Redefinir senha",
+                        "Current password": "Senha atual",
+                        "New password": "Nova senha",
+                        "Repeat password": "Repetir senha",
+                        "Reset": "Redefinir",
+                    }
+                ):
+                    self.save_config()
+                    st.success("Senha modificada com sucesso!")
+            except Exception as e:
+                error_messages = {
+                    "Password/repeat password fields cannot be empty": "Senha e repetição de senha não podem estar vazios!",
+                    "Passwords do not match": "Senhas não coincidem!",
+                    "Current password is incorrect": "Senha atual incorreta!"
                 }
-            ):
-                self.save_config()
-                st.success("Senha modificada com sucesso!")
-        except Exception as e:
-            error_messages = {
-                "Password/repeat password fields cannot be empty": "Senha e repetição de senha não podem estar vazios!",
-                "Passwords do not match": "Senhas não coincidem!",
-                "Current password is incorrect": "Senha atual incorreta!"
-            }
-            error_message = error_messages.get(str(e), str(e))
-            st.error(error_message)
+                error_message = error_messages.get(str(e), str(e))
+                st.error(error_message)
         
     def new_user_widget(self) -> None:
         try:
             (
                 email_of_registered_user,
-                username_of_registered_user,
-                name_of_registered_user,
+                _,
+                _,
             ) = self.authenticator.register_user(
                 preauthorization=False,
                 domains=['@hcpa.edu.br'],
@@ -140,31 +143,34 @@ class UsersManagement:
             st.error(error_message)
         
     def update_user_widget(self) -> None:
-        try:
-            if self.authenticator.update_user_details(
-                st.session_state["username"],
-                fields={
-                    "Form name": "Atualizar detalhes do usuário",
-                    "Field": "Campo",
-                    "Name": "Nome",
-                    "Email": "Email",
-                    "New value": "Novo valor",
-                    "Update": "Atualizar",
-                },
-            ):
-                self.save_config()
-                st.success("Campos atualizados com sucesso!")
-        except Exception as e:
-            error_messages = {
-                    "Field cannot be empty": "Campo não pode estar vazio!",
-                    "New value not provided": "Novo valor não fornecido!",
-                    "Email is not valid": "Email não é válido!",
-                    "Email already taken": "Email já registrado!",
-                    "Name is not valid": "Nome não é válido!",
-                    "New and current values are the same": "Novo e valor atual são iguais!"
-                }
-            error_message = error_messages.get(str(e), str(e))
-            st.error(error_message)
+        if st.session_state['username'] == None:
+            pass
+        else:
+            try:
+                if self.authenticator.update_user_details(
+                    st.session_state["username"],
+                    fields={
+                        "Form name": "Atualizar detalhes do usuário",
+                        "Field": "Campo",
+                        "Name": "Nome",
+                        "Email": "Email",
+                        "New value": "Novo valor",
+                        "Update": "Atualizar",
+                    },
+                ):
+                    self.save_config()
+                    st.success("Campos atualizados com sucesso!")
+            except Exception as e:
+                error_messages = {
+                        "Field cannot be empty": "Campo não pode estar vazio!",
+                        "New value not provided": "Novo valor não fornecido!",
+                        "Email is not valid": "Email não é válido!",
+                        "Email already taken": "Email já registrado!",
+                        "Name is not valid": "Nome não é válido!",
+                        "New and current values are the same": "Novo e valor atual são iguais!"
+                    }
+                error_message = error_messages.get(str(e), str(e))
+                st.error(error_message)
             
     def _remove_user_submit(self, username: str) -> None:
         if username is None:
