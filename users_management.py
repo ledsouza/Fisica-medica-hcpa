@@ -3,7 +3,6 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 import time
-import os
 from dotenv import load_dotenv
 import logging
 import boto3
@@ -11,12 +10,13 @@ from botocore.exceptions import ClientError
 
 class UsersManagement:
     def __init__(self):
+        load_dotenv()
+        
         self.config = self._open_config()
         self.config_name = 'config.yaml'
         self.bucket = 'fisica-medica-hcpa'
         self.authenticator = self._build_authenticator()
         
-        load_dotenv()
         st.session_state['user_management'] = self
         
     def _open_config(self) -> dict:
