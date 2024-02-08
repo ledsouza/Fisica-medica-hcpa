@@ -4,9 +4,9 @@ import yaml
 from yaml.loader import SafeLoader
 from users_management import UsersManagement
 import time
-from menu import menu
+from menu import menu_with_redirect
 
-menu()
+menu_with_redirect()
     
 ############################################################################################################
 # ! FOR SOME REASON THIS PART OF THE CODE HAS BLANK PAGE WHEN RUNNING LOCALLY
