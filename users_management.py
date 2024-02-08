@@ -4,6 +4,7 @@ import yaml
 from yaml.loader import SafeLoader
 import time
 import os
+from dotenv import load_dotenv
 import logging
 import boto3
 from botocore.exceptions import ClientError
@@ -15,10 +16,8 @@ class UsersManagement:
         self.bucket = 'fisica-medica-hcpa'
         self.authenticator = self._build_authenticator()
         
+        load_dotenv()
         st.session_state['user_management'] = self
-        os.environ["AWS_ACCESS_KEY_ID"] = st.secrets['s3_credentials']['access_key']
-        os.environ["AWS_SECRET_ACCESS_KEY"] = st.secrets['s3_credentials']['secret_key']
-        os.environ['AWS_DEFAULT_REGION'] = st.secrets['s3_credentials']['region']
         
     def _open_config(self) -> dict:
         s3 = boto3.client('s3')
