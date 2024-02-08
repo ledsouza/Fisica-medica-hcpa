@@ -3,8 +3,10 @@ import pandas as pd
 import re
 import plotly.graph_objects as go
 from io import BytesIO
+from menu import menu
 
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
+menu()
 
 # Extracting the data
 bi_data = st.file_uploader("Faça o upload dos dados do BI", type=["csv", "xlsx"])
