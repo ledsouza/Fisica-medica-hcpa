@@ -4,10 +4,9 @@ from users_management import UsersManagement
 def authenticated_menu():
     # Show a navigation menu for authenticated users
     st.sidebar.page_link("Home.py", label="Alterar conta")
-    st.sidebar.page_link("pages/user.py", label="Seu perfil")
     if st.session_state.authentication_status == True:
-        st.sidebar.page_link("pages/Gerenciamento de Usuários.py", label="Gerenciamento de Usuários")
-        st.sidebar.page_link("pages/Tratamento de Dados do BI.py", label="Tratamento de Dados do BI")
+        st.sidebar.page_link("pages/users.py", label="Gerenciamento de Usuários")
+        st.sidebar.page_link("pages/bi_data.py", label="Tratamento de Dados do BI")
         st.session_state['user_management'].logout_widget()
 
 

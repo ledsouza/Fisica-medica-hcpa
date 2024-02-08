@@ -13,7 +13,6 @@ class UsersManagement:
     def _open_config(self) -> dict:
         with open(".streamlit/config.yaml") as file:
             config = yaml.load(file, Loader=SafeLoader)
-            st.session_state['authenticated_usernames'] = config['credentials']['usernames']
         return config
     
     def _build_authenticator(self) -> stauth.Authenticate:
