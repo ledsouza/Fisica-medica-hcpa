@@ -34,5 +34,7 @@ if st.session_state["authentication_status"] is False:
     
 elif st.session_state["authentication_status"] is None:
     st.warning('Por favor, preencha os campos de usuário e senha.')
+else:
+    st.write(f'# Bem-vindo, {st.session_state.name}!')
 
 menu()

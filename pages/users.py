@@ -4,69 +4,34 @@ import yaml
 from yaml.loader import SafeLoader
 from users_management import UsersManagement
 import time
+from menu import menu
 
-st.write('Gerenciamento de Usuários')
-
-# user_management = UsersManagement()
-
-# user_management.login_widget()
-
-# if st.session_state["authentication_status"] is False:
-#     st.error('Usuário ou senha incorretos!')
-    
-#     if 'forgot_password_clicked' not in st.session_state:
-#         st.session_state['forgot_password_clicked'] = False
-#     if 'forgot_username_clicked' not in st.session_state:
-#         st.session_state['forgot_username_clicked'] = False
-        
-#     def forgot_password_button():
-#         st.session_state['forgot_password_clicked'] = True
-#         st.session_state['forgot_username_clicked'] = False
-#     def forgot_username_button():
-#         st.session_state['forgot_username_clicked'] = True
-#         st.session_state['forgot_password_clicked'] = False
-        
-#     col1, col2 = st.columns([1, 3.4])
-    
-#     with col1:
-#         st.button('Esqueceu a senha?', type='primary', key='forgot_password', on_click=forgot_password_button)
-#     if st.session_state['forgot_password_clicked'] and not st.session_state['forgot_username_clicked']:
-#         user_management.forgot_password_widget()
-#     with col2:
-#         st.button('Esqueceu o usuário?', type='primary', key='forgot_username', on_click=forgot_username_button)
-#     if st.session_state['forgot_username_clicked'] and not st.session_state['forgot_password_clicked']:
-#         user_management.forgot_username_widget()
-    
-# elif st.session_state["authentication_status"] is None:
-#     st.warning('Por favor, preencha os campos de usuário e senha.')
-    
-# elif st.session_state["authentication_status"]:
-#     user_management.logout_widget()
+menu()
     
 ############################################################################################################
-# FOR SOME REASON THIS PART OF THE CODE HAS BLANK PAGE WHEN RUNNING LOCALLY
+# ! FOR SOME REASON THIS PART OF THE CODE HAS BLANK PAGE WHEN RUNNING LOCALLY
 ############################################################################################################
-    # tab1, tab2, tab3, tab4 = st.tabs(
-    #     [
-    #         "Redefinir senha",
-    #         "Registrar usuário",
-    #         "Remover usuário",
-    #         "Atualizar detalhes do usuário"
-    #     ]
-    # )
+tab1, tab2, tab3, tab4 = st.tabs(
+    [
+        "Redefinir senha",
+        "Registrar usuário",
+        "Remover usuário",
+        "Atualizar detalhes do usuário"
+    ]
+)
 
-    # # Creating a password reset widget
-    # with tab1:
-    #     user_management.reset_password_widget()
+# Creating a password reset widget
+with tab1:
+    st.session_state.user_management.reset_password_widget()
 
-    # # Creating a new user registration widget
-    # with tab2:
-    #     user_management.new_user_widget()
-    
-    # # Creating a remove user widget    
-    # with tab3:
-    #     user_management.remove_user_widget()
+# Creating a new user registration widget
+with tab2:
+    st.session_state.user_management.new_user_widget()
 
-    # # Creating an update user details widget
-    # with tab4:
-    #     user_management.update_user_widget()
+# Creating a remove user widget    
+with tab3:
+    st.session_state.user_management.remove_user_widget()
+
+# Creating an update user details widget
+with tab4:
+    st.session_state.user_management.update_user_widget()
