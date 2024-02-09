@@ -44,21 +44,17 @@ if bi_data is not None:
 
     
     bi_dataframe = load_data(bi_data, map_to_sheet_name[sheet_name])
-    st.dataframe(bi_dataframe, use_container_width=True, hide_index=True)
 
     # Cleaning the data
     
     data_cleaner = DataCleaning(bi_dataframe)
     cleaned_bi = data_cleaner.clean_data()
+    
+    ## Removing outliers of Atividade Administrada
+    cleaned_bi = cleaned_bi.query('`Atividade Administrada` > 10.0')
+    cleaned_bi = cleaned_bi.query('`Peso (kg)` < 150.0 and `Peso (kg)` > 10.0')
+    
     st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
-    
-    # cleaned_bi = clean_data(bi_dataframe)   
-    # st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
-    
-    # cleaned_bi = cleaned_bi.query('`Atividade Administrada` > 10.0')
-    # cleaned_bi = cleaned_bi.query('`Peso (kg)` < 150.0 and `Peso (kg)` > 10.0')
-    
-    # cleaned_bi['Nome do produto'] = cleaned_bi['Nome do produto'].str.replace('Tc-99m', '99mTc-MDP')
     
     # tableviz_bi = cleaned_bi.copy()
     # tableviz_bi['Data'] = tableviz_bi['Data'].dt.strftime('%d/%m/%Y')
