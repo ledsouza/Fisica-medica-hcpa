@@ -1,10 +1,9 @@
 import streamlit as st
 from menu import menu
 from users_management import UsersManagement
-import os
-import boto3
     
 user_management = UsersManagement()
+
 user_management.login_widget()
 
 if st.session_state["authentication_status"] is False:

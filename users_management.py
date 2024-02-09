@@ -11,7 +11,6 @@ from botocore.exceptions import ClientError
 class UsersManagement:
     def __init__(self):
         load_dotenv()
-        
         self.config = self._open_config()
         self.config_name = 'config.yaml'
         self.bucket = 'fisica-medica-hcpa'

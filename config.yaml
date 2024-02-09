@@ -1,0 +1,14 @@
+cookie:
+  expiry_days: 1
+  key: random_signature_key
+  name: random_cookie_name
+credentials:
+  usernames:
+    ledsouza:
+      email: ledsouza@hcpa.edu.br
+      logged_in: true
+      name: Leandro Souza
+      password: $2b$12$n0pLYqh/6rbGnP8EOZwUu.wimJuW0MOlZYjOLasUu2IKXX2XjJlOG
+preauthorized:
+  emails:
+  - jbsalazar@hcpa.edu.br
