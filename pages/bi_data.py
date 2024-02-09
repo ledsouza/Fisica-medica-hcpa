@@ -22,10 +22,10 @@ exames = ['Cintilografia Óssea',
           ]
 map_to_sheet_name = dict(zip(exames, ['Cintilografia Óssea',
                                       'Cintilografia Renal Estática (D',
-                                      'Cintilografia Renal Estática (D',
+                                      'Cintilografia Renal Dinâmica (D',
                                       'Cintilografia Miocárdica em Rep',
                                       'Cintilografia Miocardica de Esf',
-                                      'Cintilografia Miocárdica com Dip',
+                                      'Cintilografia Miocardica de Dip',
                                       'Cintilografia de Paratireóides',
                                       'Cintilografia para Determinação']))
 
@@ -35,7 +35,9 @@ if bi_data is not None:
         if data.name.endswith("csv"):
             bi_dataframe = pd.read_csv(data)
         else:
-            bi_dataframe = pd.read_excel(data, skiprows=14, usecols='A:T', sheet_name=sheet_name)
+            check_header = pd.read_excel(data, sheet_name=sheet_name, usecols='A')
+            rows_to_skip = check_header[check_header['Unnamed: 0'] == 'SERVICO DE MEDICINA NUCLEAR'].index[0] + 2
+            bi_dataframe = pd.read_excel(data, skiprows=rows_to_skip, usecols='A:T', sheet_name=sheet_name)
             return bi_dataframe
 
     sheet_name = st.selectbox("Selecione o exame", exames)
