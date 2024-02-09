@@ -55,6 +55,8 @@ if bi_data is not None:
     cleaned_bi = cleaned_bi.query('`Peso (kg)` < 150.0 and `Peso (kg)` > 10.0')
     
     st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
+    exame = cleaned_bi['Nome da definição do procedimento'].values[0].capitalize()
+    st.write(exame)
     
     # tableviz_bi = cleaned_bi.copy()
     # tableviz_bi['Data'] = tableviz_bi['Data'].dt.strftime('%d/%m/%Y')
