@@ -11,12 +11,32 @@ menu_with_redirect()
 # Extracting the data
 bi_data = st.file_uploader("Faça o upload dos dados do BI", type=["csv", "xlsx"])
 
+exames = ['Cintilografia Óssea', 
+          'Cintilografia Renal Estática (DMSA)', 
+          'Cintilografia Renal Estática (DTPA)',
+          'Cintilografia Miocárdica em Repouso',
+          'Cintilografia Miocardica de Esforço',
+          'Cintilografia Miocárdica com Dipiridamol',
+          'Cintilografia de Paratireoides',
+          'Cintilografia para Determinação de Fluxo Renal',
+          ]
+map_to_sheet_name = dict(zip(exames, ['Cintilografia Óssea',
+                                      'Cintilografia Renal Estática (D',
+                                      'Cintilografia Renal Estática (D',
+                                      'Cintilografia Miocárdica em Rep',
+                                      'Cintilografia Miocardica de Esf',
+                                      'Cintilografia Miocárdica com Dip',
+                                      'Cintilografia de Paratireoides',
+                                      'Cintilografia para Determinação']))
+
+sheet_name = st.selectbox("Selecione o exame", exames)
+
 @st.cache_data
 def load_data(data):
     if data.name.endswith("csv"):
         bi_dataframe = pd.read_csv(data)
     else:
-        bi_dataframe = pd.read_excel(data, skiprows=14, usecols='A:T')
+        bi_dataframe = pd.read_excel(data, skiprows=14, usecols='A:T', sheet_name=map_to_sheet_name[sheet_name])
     return bi_dataframe
 
 if bi_data is not None:
