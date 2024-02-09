@@ -62,37 +62,49 @@ resource "google_cloud_run_v2_service" "default" {
   location = "us-central1"
 
   template {
-    containers {
-      image = "us-central1-docker.pkg.dev/fisica-medica-hcpa/fisica-medica-repo/mnmanagement"
-      env {
-        name = "AWS_ACCESS_KEY_ID"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.access_key.secret_id
-            version = "latest"
+    spec {
+      containers {
+        image = "us-central1-docker.pkg.dev/fisica-medica-hcpa/fisica-medica-repo/mnmanagement"
+
+        ports {
+          container_port = 8501
+        }
+
+        env {
+          name = "AWS_ACCESS_KEY_ID"
+          value_source {
+            secret_key_ref {
+              secret  = google_secret_manager_secret.access_key.secret_id
+              version = "latest"
+            }
+          }
+        }
+        env {
+          name = "AWS_SECRET_ACCESS_KEY"
+          value_source {
+            secret_key_ref {
+              secret  = google_secret_manager_secret.secret_access_key.secret_id
+              version = "latest"
+            }
+          }
+        }
+        env {
+          name = "AWS_DEFAULT_REGION"
+          value_source {
+            secret_key_ref {
+              secret  = google_secret_manager_secret.default_region.secret_id
+              version = "latest"
+            }
           }
         }
       }
-      env {
-        name = "AWS_SECRET_ACCESS_KEY"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.secret_access_key.secret_id
-            version = "latest"
-          }
-        }
-      }
-      env {
-        name = "AWS_DEFAULT_REGION"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.default_region.secret_id
-            version = "latest"
-          }
-        }
-      }
+      service_account = google_service_account.default.email
     }
-    service_account = google_service_account.default.email
+    depends_on = [google_secret_manager_secret_version.default]
   }
-  depends_on = [google_secret_manager_secret_version.default]
+
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
 }
