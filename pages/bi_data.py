@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from io import BytesIO
 from menu import menu_with_redirect
-from cleaning_data import clean_data
+from cleaning_data import DataCleaning
 
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
 menu_with_redirect()
@@ -42,10 +42,16 @@ if bi_data is not None:
 
     sheet_name = st.selectbox("Selecione o exame", exames)
 
+    
     bi_dataframe = load_data(bi_data, map_to_sheet_name[sheet_name])
     st.dataframe(bi_dataframe, use_container_width=True, hide_index=True)
 
     # Cleaning the data
+    
+    data_cleaner = DataCleaning(bi_dataframe)
+    cleaned_bi = data_cleaner.clean_data()
+    st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
+    
     # cleaned_bi = clean_data(bi_dataframe)   
     # st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
     
