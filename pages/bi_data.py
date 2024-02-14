@@ -56,160 +56,50 @@ if bi_data is not None:
     # cleaned_bi = cleaned_bi.query('`Atividade Administrada` > 10.0')
     # cleaned_bi = cleaned_bi.query('`Peso (kg)` < 150.0 and `Peso (kg)` > 10.0')
     
-    tableviz = stylized_table(cleaned_bi)
-    st.dataframe(tableviz, use_container_width=True, hide_index=True)
+    # Download button
+    @st.cache_data
+    def convert_to_csv(data):
+        return data.to_csv(index=False)
     
+    col1, col2 = st.columns(2)
+    with col1:
+        file_name = st.text_input("Prencha aqui o nome do arquivo para download", value="dados_tratados")
+        
+    with col2:
+        st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+        if bi_data.name.endswith("csv"):
+            st.download_button(
+                label="Baixar os dados tratados",
+                data=convert_to_csv(cleaned_bi),
+                file_name=f"{file_name}.csv",
+                mime="text/csv",
+                type='primary'
+            )
+        else:
+            buffer = BytesIO()
+            
+            with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+                cleaned_bi.to_excel(writer, sheet_name='Sheet1', index=False)
+                writer.close()
+                
+                st.download_button(
+                    label="Baixar os dados tratados",
+                    data=buffer,
+                    file_name=f"{file_name}.xlsx",
+                    mime="application/vnd.ms-excel",
+                    type='primary'
+                )
+    
+    tab1, tab2, tab3 = st.tabs(["Tabela", "Atividade Administrada", "Dose"])
+    
+    with tab1:
+        tableviz = stylized_table(cleaned_bi)
+        st.dataframe(tableviz, use_container_width=True, hide_index=True)
+        
     # Plotting the data
     plot = DataPlotting(cleaned_bi)
-    plot.plot_atividade_administrada()
     
-
-    
-    # # Plotting the data
-    # plot_bi = cleaned_bi.copy()
-    # plot_bi['Atividade Administrada (str)'] = plot_bi['Atividade Administrada'].astype(str).str.replace('.', ',')
-    # plot_bi['Dose (str)'] = plot_bi['Dose (mSv)'].astype(str).str.replace('.', ',')
-    
-    # atividade_max = 30
-    # atividade_min = 20
-    # data_inicio = cleaned_bi['Mês'].values[0]
-    # data_fim = cleaned_bi['Mês'].values[-1]
-    # title_text = f"Atividade Administrada em cada solicitação de exame<br><sup size=16>Paciente Adulto com idade acima de 18 anos, Isótopo: Tc-99m, Fármaco: MDP<br>Perído: {data_inicio} a {data_fim}</sup>"
-
-    # fig = go.Figure(
-    #     data=go.Scatter(
-    #         x=cleaned_bi["Número da Solicitação do Exame"],
-    #         y=cleaned_bi["Atividade Administrada"],
-    #         mode="markers",
-    #         name="",
-    #         text=cleaned_bi["Código ID do Paciente"],
-    #         customdata=plot_bi["Atividade Administrada (str)"],
-    #         hovertemplate="<b>Código ID do Paciente</b>: %{text}<br><b>Atividade Administrada</b>: %{customdata} mCi",
-    #     )
-    # )
-
-    # fig.update_layout(
-    #     title=title_text,
-    #     title_font=dict(size=18),
-    #     xaxis_title="",
-    #     yaxis_title="Atividade Administrada [mCi]",
-    #     xaxis=dict(
-    #         range=[0, cleaned_bi["Número da Solicitação do Exame"].max()],
-    #         tickmode="array",
-    #         tickvals=[],
-    #         fixedrange=True,
-    #     ),
-    #     height=600,
-    #     width=1500
-    # )
-
-    # fig.add_shape(
-    #     type="line",
-    #     x0=0,
-    #     y0=atividade_max,
-    #     x1=1,
-    #     y1=atividade_max,
-    #     xref="paper",
-    #     line=dict(color="red", dash="dot"),
-    # )
-
-    # fig.add_shape(
-    #     type="line",
-    #     x0=0,
-    #     y0=atividade_min,
-    #     x1=1,
-    #     y1=atividade_min,
-    #     xref="paper",
-    #     line=dict(color="red", dash="dot"),
-    # )
-
-    # st.plotly_chart(fig, use_container_width=True)
-    
-    # fator_conversao = 0.15
-    # dose_max = atividade_max * fator_conversao
-    # dose_min = atividade_min * fator_conversao
-
-    # title_text = f"Dose recebida pelo paciente em cada solicitação de exame<br><sup size=16>Paciente Adulto com idade acima de 18 anos, Isótopo: Tc-99m, Fármaco: MDP<br>Perído: {data_inicio} a {data_fim}</sup>"
-
-    # fig = go.Figure(
-    #     data=go.Scatter(
-    #         x=cleaned_bi["Número da Solicitação do Exame"],
-    #         y=cleaned_bi["Dose (mSv)"],
-    #         mode="markers",
-    #         name='',
-    #         text=cleaned_bi["Código ID do Paciente"],
-    #         customdata=plot_bi['Dose (str)'],
-    #         hovertemplate="<b>Código ID do Paciente</b>: %{text}<br><b>Atividade Administrada</b>: %{customdata} mSv",
-    #     )
-    # )
-
-    # fig.update_layout(
-    #     title=title_text,
-    #     title_font=dict(size=18),
-    #     xaxis_title="",
-    #     yaxis_title="Dose [mSv]",
-    #     xaxis=dict(
-    #         range=[0, cleaned_bi["Número da Solicitação do Exame"].max()],
-    #         tickmode="array",
-    #         tickvals=[],
-    #         fixedrange=True
-    #     ),
-    #     height=600,
-    #     width=1500
-    # )
-
-    # fig.add_shape(
-    #     type="line",
-    #     x0=0,
-    #     y0=dose_max,
-    #     x1=1,
-    #     y1=dose_max,
-    #     xref='paper',
-    #     line=dict(color="red", dash="dot")
-    # )
-
-    # fig.add_shape(
-    #     type="line",
-    #     x0=0,
-    #     y0=dose_min,
-    #     x1=1,
-    #     y1=dose_min,
-    #     xref='paper',
-    #     line=dict(color="red", dash="dot")
-    # )
-
-    # st.plotly_chart(fig, use_container_width=True)
-    
-    # # Download button
-    # @st.cache_data
-    # def convert_to_csv(data):
-    #     return data.to_csv(index=False)
-    
-    # col1, col2 = st.columns(2)
-    # with col1:
-    #     file_name = st.text_input("Prencha aqui o nome do arquivo para download", value="dados_tratados")
-        
-    # with col2:
-    #     st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-    #     if bi_data.name.endswith("csv"):
-    #         st.download_button(
-    #             label="Baixar dados tratados",
-    #             data=convert_to_csv(cleaned_bi),
-    #             file_name=f"{file_name}.csv",
-    #             mime="text/csv",
-    #             type='primary'
-    #         )
-    #     else:
-    #         buffer = BytesIO()
-            
-    #         with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-    #             cleaned_bi.to_excel(writer, sheet_name='Sheet1', index=False)
-    #             writer.close()
-                
-    #             st.download_button(
-    #                 label="Baixar dados tratados",
-    #                 data=buffer,
-    #                 file_name=f"{file_name}.xlsx",
-    #                 mime="application/vnd.ms-excel",
-    #                 type='primary'
-    #             )
+    with tab2:
+        plot.plot_atividade_administrada()
+    with tab3:
+        plot.plot_dose()
