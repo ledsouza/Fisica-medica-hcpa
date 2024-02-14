@@ -35,8 +35,10 @@ class DataCleaning:
         
     def _convert_to_correct_type(self):
         self.bi_dataframe['Idade do paciente'] = self.bi_dataframe['Idade do paciente'].astype(int)
-        self.bi_dataframe['Código ID do Paciente'] = self.bi_dataframe['Código ID do Paciente'].astype(int)
-        self.bi_dataframe['Peso (kg)'] = self.bi_dataframe['Peso (kg)'].astype(float)   
+        self.bi_dataframe['Código ID do Paciente'] = self.bi_dataframe['Código ID do Paciente'].astype(str).replace('\.0', '', regex=True)
+        self.bi_dataframe['Número do Prontuário'] = self.bi_dataframe['Número do Prontuário'].astype(str).replace('\.0', '', regex=True)
+        self.bi_dataframe['Peso (kg)'] = self.bi_dataframe['Peso (kg)'].astype(float)
+        self.bi_dataframe['Número de imagens e instâncias do estudo armazenadas no PACS'] = self.bi_dataframe['Número de imagens e instâncias do estudo armazenadas no PACS'].astype(int)
         
     def _drop_na(self):
         self.bi_dataframe.dropna(subset=['Código ID do Paciente'], inplace=True)

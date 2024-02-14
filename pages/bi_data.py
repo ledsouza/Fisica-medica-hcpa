@@ -5,6 +5,7 @@ from io import BytesIO
 from menu import menu_with_redirect
 from data_processing.cleaning_data import DataCleaning
 from data_processing.plot_data import DataPlotting
+from data_processing.stylized_table import stylized_table
 
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
 menu_with_redirect()
@@ -55,29 +56,14 @@ if bi_data is not None:
     # cleaned_bi = cleaned_bi.query('`Atividade Administrada` > 10.0')
     # cleaned_bi = cleaned_bi.query('`Peso (kg)` < 150.0 and `Peso (kg)` > 10.0')
     
-    st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
+    tableviz = stylized_table(cleaned_bi)
+    st.dataframe(tableviz, use_container_width=True, hide_index=True)
     
     # Plotting the data
     plot = DataPlotting(cleaned_bi)
     plot.plot_atividade_administrada()
     
-    # tableviz_bi = cleaned_bi.copy()
-    # tableviz_bi['Data'] = tableviz_bi['Data'].dt.strftime('%d/%m/%Y')
-    # tableviz_bi['Ano'] = tableviz_bi['Ano'].astype(str)
-    # tableviz_bi['Código ID do Paciente'] = tableviz_bi['Código ID do Paciente'].astype(str)
-    # tableviz_bi.rename(columns={
-    #     'Peso (kg)': 'Peso',
-    #     'Atividade específica (mCi/kg)': 'Atividade Específica',
-    #     'Dose (mSv)': 'Dose'
-    # }, inplace=True)
-    
-    # tableviz_bi = tableviz_bi.style.format({
-    #     'Atividade Administrada': '{:.2f} mCi',
-    #     'Peso': '{:.2f} kg',
-    #     'Dose': '{:.2f} mSv',
-    # }, decimal=',')
-    
-    # st.dataframe(tableviz_bi, use_container_width=True, hide_index=True)
+
     
     # # Plotting the data
     # plot_bi = cleaned_bi.copy()
