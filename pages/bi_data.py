@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 from io import BytesIO
 from menu import menu_with_redirect
 from cleaning_data import DataCleaning
+from plot_data import DataPlotting
 
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
 menu_with_redirect()
@@ -51,12 +52,14 @@ if bi_data is not None:
     cleaned_bi = data_cleaner.clean_data()
     
     ## Removing outliers of Atividade Administrada
-    cleaned_bi = cleaned_bi.query('`Atividade Administrada` > 10.0')
-    cleaned_bi = cleaned_bi.query('`Peso (kg)` < 150.0 and `Peso (kg)` > 10.0')
+    # cleaned_bi = cleaned_bi.query('`Atividade Administrada` > 10.0')
+    # cleaned_bi = cleaned_bi.query('`Peso (kg)` < 150.0 and `Peso (kg)` > 10.0')
     
     st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
-    exame = cleaned_bi['Nome da definição do procedimento'].values[0].capitalize()
-    st.write(exame)
+    
+    # Plotting the data
+    plot = DataPlotting(cleaned_bi)
+    plot.plot_atividade_administrada()
     
     # tableviz_bi = cleaned_bi.copy()
     # tableviz_bi['Data'] = tableviz_bi['Data'].dt.strftime('%d/%m/%Y')
