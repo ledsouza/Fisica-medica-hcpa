@@ -7,6 +7,14 @@ from data_processing.cleaning_data import DataCleaning
 from data_processing.plot_data import DataPlotting
 from data_processing.stylized_table import stylized_table
 
+class RangeError(Exception):
+    pass
+
+try:
+    raise RangeError("value is out of range")
+except RangeError as e:
+    print(e)
+
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
 menu_with_redirect()
 
@@ -52,9 +60,52 @@ if bi_data is not None:
     data_cleaner = DataCleaning(bi_dataframe)
     cleaned_bi = data_cleaner.clean_data()
     
-    ## Removing outliers of Atividade Administrada
-    # cleaned_bi = cleaned_bi.query('`Atividade Administrada` > 10.0')
-    # cleaned_bi = cleaned_bi.query('`Peso (kg)` < 150.0 and `Peso (kg)` > 10.0')
+    # Filters
+    with st.sidebar:
+        st.markdown("<h1 style='text-align: center;'>Filtros</h1>", unsafe_allow_html=True)
+        
+        periodo = st.date_input(
+            label="Selecione o Período",
+            min_value=cleaned_bi["Data"].min(),
+            max_value=cleaned_bi["Data"].max(),
+            value=(cleaned_bi["Data"].min(), cleaned_bi["Data"].max()),
+        )
+        try:
+            start_date, end_date = periodo
+        except RangeError:
+            st.error("É necessário selecionar um período válido")
+            st.stop()
+            
+        atividade_administrada = st.slider('Selecione a Atividade Administrada', 0.0, cleaned_bi['Atividade Administrada'].max(), (0.0, cleaned_bi['Atividade Administrada'].max()))
+        dose = st.slider('Selecione a Dose', 0.0, cleaned_bi['Dose (mSv)'].max(), (0.0, cleaned_bi['Dose (mSv)'].max()))
+        if cleaned_bi['Peso (kg)'].isnull().all():
+            st.error("Não há dados de peso disponíveis para filtrar")
+        else:
+            peso = st.slider('Selecione o Peso', 0.0, cleaned_bi['Peso (kg)'].max(), (0.0, cleaned_bi['Peso (kg)'].max()))
+        idade = st.slider('Selecione a Idade', 0, cleaned_bi['Idade do paciente'].max(), (0, cleaned_bi['Idade do paciente'].max()))
+        sexo = st.multiselect("Selecione o Sexo", cleaned_bi['Sexo'].unique(), cleaned_bi['Sexo'].unique())
+        nome_sala = st.multiselect("Selecione a Sala", cleaned_bi['Nome da sala'].unique(), cleaned_bi['Nome da sala'].unique())
+    
+    if cleaned_bi['Peso (kg)'].isnull().all():
+        query = """
+        @periodo[0] <= Data <= @periodo[1] and \
+        @atividade_administrada[0] <= `Atividade Administrada` <= @atividade_administrada[1] and \
+        @dose[0] <= `Dose (mSv)` <= @dose[1] and \
+        @idade[0] <= `Idade do paciente` <= @idade[1] and \
+        Sexo in @sexo and \
+        `Nome da sala` in @nome_sala
+        """
+    else:  
+        query = """
+        @periodo[0] <= Data <= @periodo[1] and \
+        @atividade_administrada[0] <= `Atividade Administrada` <= @atividade_administrada[1] and \
+        @dose[0] <= `Dose (mSv)` <= @dose[1] and \
+        @peso[0] <= `Peso (kg)` <= @peso[1] and \
+        @idade[0] <= `Idade do paciente` <= @idade[1] and \
+        Sexo in @sexo and \
+        `Nome da sala` in @nome_sala
+        """
+    filtered_data = cleaned_bi.query(query)
     
     # Download button
     @st.cache_data
@@ -70,7 +121,7 @@ if bi_data is not None:
         if bi_data.name.endswith("csv"):
             st.download_button(
                 label="Baixar os dados tratados",
-                data=convert_to_csv(cleaned_bi),
+                data=convert_to_csv(filtered_data),
                 file_name=f"{file_name}.csv",
                 mime="text/csv",
                 type='primary'
@@ -79,7 +130,7 @@ if bi_data is not None:
             buffer = BytesIO()
             
             with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-                cleaned_bi.to_excel(writer, sheet_name='Sheet1', index=False)
+                filtered_data.to_excel(writer, sheet_name='Sheet1', index=False)
                 writer.close()
                 
                 st.download_button(
@@ -93,11 +144,12 @@ if bi_data is not None:
     tab1, tab2, tab3 = st.tabs(["Tabela", "Atividade Administrada", "Dose"])
     
     with tab1:
-        tableviz = stylized_table(cleaned_bi)
+        tableviz = stylized_table(filtered_data)
         st.dataframe(tableviz, use_container_width=True, hide_index=True)
+        st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
         
     # Plotting the data
-    plot = DataPlotting(cleaned_bi)
+    plot = DataPlotting(filtered_data)
     
     with tab2:
         plot.plot_atividade_administrada()

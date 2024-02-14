@@ -7,7 +7,7 @@ class DataCleaning:
         self.bi_dataframe = bi_dataframe
         
     def _fill_data(self):
-        self.bi_dataframe['Data'] = self.bi_dataframe['Data'].fillna(method='ffill')
+        self.bi_dataframe['Data'] = self.bi_dataframe['Data'].ffill()
         self.bi_dataframe.drop(['Ano', 'Mês'], axis=1, inplace=True)
         self.bi_dataframe['Mês'] = self.bi_dataframe['Data'].dt.strftime('%B')
         month_translation = {
@@ -33,6 +33,9 @@ class DataCleaning:
                                                        .apply(lambda x: str(x).replace(',', '.') if re.match(r'^\d*\,?\d*$', str(x)) else None))
         self.bi_dataframe['Atividade Administrada'] = self.bi_dataframe['Atividade Administrada'].astype(float)
         
+    def _cleaning_sala_nao_definida(self):
+        self.bi_dataframe['Nome da sala'] = self.bi_dataframe['Nome da sala'].replace('Nao_definida', 'Não definida').replace('NOT SPECIFIED', 'Não definida')
+        
     def _convert_to_correct_type(self):
         self.bi_dataframe['Idade do paciente'] = self.bi_dataframe['Idade do paciente'].astype(int)
         self.bi_dataframe['Código ID do Paciente'] = self.bi_dataframe['Código ID do Paciente'].astype(str).replace('\.0', '', regex=True)
@@ -50,6 +53,7 @@ class DataCleaning:
     def clean_data(self):
         self._fill_data()
         self._cleaning_atividade_administrada()
+        self._cleaning_sala_nao_definida()
         self._drop_na()
         self._convert_to_correct_type()
         self._drop_columns()
