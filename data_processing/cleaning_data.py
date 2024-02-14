@@ -41,7 +41,6 @@ class DataCleaning:
     def _drop_na(self):
         self.bi_dataframe.dropna(subset=['Código ID do Paciente'], inplace=True)
         self.bi_dataframe.dropna(subset=['Atividade Administrada'], inplace=True)
-        self.bi_dataframe.dropna(subset=['Peso (kg)'], inplace=True)
         
     def _drop_columns(self):
         self.bi_dataframe.drop(['Atividade Administrada NUMÉRICO', 'Atividade Administrada preenchida pelo USUÁRIO'], axis=1, inplace=True) 
