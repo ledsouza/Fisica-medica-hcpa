@@ -3,8 +3,8 @@ import pandas as pd
 import plotly.graph_objects as go
 from io import BytesIO
 from menu import menu_with_redirect
-from cleaning_data import DataCleaning
-from plot_data import DataPlotting
+from data_processing.cleaning_data import DataCleaning
+from data_processing.plot_data import DataPlotting
 
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
 menu_with_redirect()
