@@ -7,6 +7,7 @@ class DataPlotting:
     def __init__(self, data: pd.DataFrame):
         self.data = self._viz_data(data)
         self.exame, self.atividade_max, self.atividade_min, self.dose_max, self.dose_min = self._extract_info(data)
+        self.periodo = f"{self.data['Mês'].values[0]} de {self.data['Ano'].values[0]} a {self.data['Mês'].values[-1]} de {self.data['Ano'].values[-1]}"
     
     @staticmethod    
     def _viz_data(data):
@@ -37,10 +38,7 @@ class DataPlotting:
 
     def plot_atividade_administrada(self): 
 
-        data_inicio = self.data['Mês'].values[0]
-        data_fim = self.data['Mês'].values[-1]
-        ano = self.data['Ano'].values[0]
-        title_text = f"Atividade Administrada em cada solicitação de exame<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {data_inicio} a {data_fim} ({ano})</sup>"
+        title_text = f"Atividade Administrada em cada solicitação de exame<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
 
         fig = go.Figure(
             data=go.Scatter(
@@ -93,10 +91,7 @@ class DataPlotting:
         
     def plot_dose(self):
 
-        data_inicio = self.data['Mês'].values[0]
-        data_fim = self.data['Mês'].values[-1]
-        ano = self.data['Ano'].values[0]
-        title_text = f"Dose recebida pelo paciente em cada solicitação de exame<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {data_inicio} a {data_fim} ({ano})</sup>"
+        title_text = f"Dose recebida pelo paciente em cada solicitação de exame<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
 
         fig = go.Figure(
             data=go.Scatter(

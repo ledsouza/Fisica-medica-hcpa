@@ -8,7 +8,6 @@ from data_processing.cleaning_data import DataCleaning
 from data_processing.filters import filters_bi
 from data_processing.plot_data import DataPlotting
 from data_processing.stylized_table import stylized_table
-from exceptions import EmptySheet
 
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
 menu_with_redirect()
