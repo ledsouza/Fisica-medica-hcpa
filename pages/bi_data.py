@@ -49,12 +49,12 @@ if bi_data is not None:
     
     bi_dataframe = load_data(bi_data, map_to_sheet_name[sheet_name])
 
-    # Cleaning the data   
+    # Cleaning the data
     data_cleaner = DataCleaning(bi_dataframe)
     cleaned_bi = data_cleaner.clean_data()
     
-    # Filters   
-    filtered_data = filters_bi(cleaned_bi)
+    # Filters
+    filtered_df = filters_bi(cleaned_bi)
     
     # Download button
     @st.cache_data
@@ -70,7 +70,7 @@ if bi_data is not None:
         if bi_data.name.endswith("csv"):
             st.download_button(
                 label="Baixar os dados tratados",
-                data=convert_to_csv(filtered_data),
+                data=convert_to_csv(filtered_df),
                 file_name=f"{file_name}.csv",
                 mime="text/csv",
                 type='primary'
@@ -79,7 +79,7 @@ if bi_data is not None:
             buffer = BytesIO()
             
             with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-                filtered_data.to_excel(writer, sheet_name='Sheet1', index=False)
+                filtered_df.to_excel(writer, sheet_name='Sheet1', index=False)
                 writer.close()
                 
                 st.download_button(
@@ -93,12 +93,12 @@ if bi_data is not None:
     tab1, tab2, tab3 = st.tabs(["Tabela", "Atividade Administrada", "Dose"])
     
     with tab1:
-        tableviz = stylized_table(filtered_data)
+        tableviz = stylized_table(filtered_df)
         st.dataframe(tableviz, use_container_width=True, hide_index=True)
         st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
         
     # Plotting the data
-    plot = DataPlotting(filtered_data)
+    plot = DataPlotting(filtered_df)
     
     with tab2:
         plot.plot_atividade_administrada()
