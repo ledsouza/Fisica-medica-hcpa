@@ -8,6 +8,7 @@ from data_processing.cleaning_data import DataCleaning
 from data_processing.filters import filters_bi
 from data_processing.plot_data import DataPlotting
 from data_processing.stylized_table import stylized_table
+from exceptions import EmptySheet
 
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
 menu_with_redirect()
@@ -39,9 +40,22 @@ if bi_data is not None:
         if data.name.endswith("csv"):
             bi_dataframe = pd.read_csv(data)
         else:
-            check_header = pd.read_excel(data, sheet_name=sheet_name, usecols='A')
-            rows_to_skip = check_header[check_header['Unnamed: 0'] == 'SERVICO DE MEDICINA NUCLEAR'].index[0] + 2
-            bi_dataframe = pd.read_excel(data, skiprows=rows_to_skip, usecols='A:T', sheet_name=sheet_name)
+            try:
+                check_header = pd.read_excel(data, sheet_name=sheet_name, usecols='A')
+                rows_to_skip = check_header[check_header['Unnamed: 0'] == 'SERVICO DE MEDICINA NUCLEAR'].index[0] + 2
+                bi_dataframe = pd.read_excel(data, skiprows=rows_to_skip, usecols='A:T', sheet_name=sheet_name)
+            except KeyError:
+                st.error('''
+                         Não há dados disponíveis para o exame selecionado.
+                         Verifique a planilha selecionada e tente novamente.
+                         ''')
+                st.stop()
+            except ValueError:
+                st.error('''
+                         Não há dados disponíveis para o exame selecionado.
+                         Verifique a planilha selecionada e tente novamente.
+                         ''')
+                st.stop()
             return bi_dataframe
 
     sheet_name = st.selectbox("Selecione o exame", exames)
@@ -95,7 +109,7 @@ if bi_data is not None:
     with tab1:
         tableviz = stylized_table(filtered_df)
         st.dataframe(tableviz, use_container_width=True, hide_index=True)
-        st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
+        #st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
         
     # Plotting the data
     plot = DataPlotting(filtered_df)
