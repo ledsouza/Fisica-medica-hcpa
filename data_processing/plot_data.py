@@ -12,8 +12,8 @@ class DataPlotting:
     @staticmethod    
     def _viz_data(data):
         viz_data = data.copy()
-        viz_data['Atividade Administrada (str)'] = viz_data['Atividade Administrada'].astype(str).str.replace('.', ',')
-        viz_data['Dose (str)'] = viz_data['Dose (mSv)'].astype(str).str.replace('.', ',')
+        viz_data['Atividade Administrada (str)'] = viz_data['Atividade Administrada'].apply(lambda x: f"{x:.2f}").str.replace('.', ',')
+        viz_data['Dose (str)'] = viz_data['Dose (mSv)'].apply(lambda x: f"{x:.2f}").str.replace('.', ',')
         return viz_data
     
     @staticmethod
