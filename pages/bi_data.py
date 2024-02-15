@@ -117,7 +117,7 @@ if bi_data is not None:
         tableviz = stylized_table(filtered_df)
         st.dataframe(tableviz, use_container_width=True, hide_index=True)
         
-        st.markdown('# Estatística Descritiva')
+        st.markdown('## Estatística Descritiva')
         
         if not filtered_df['Peso (kg)'].isnull().all():
             descritive_statistics = stylized_statistics(filtered_df)
