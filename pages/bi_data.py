@@ -7,14 +7,6 @@ from data_processing.cleaning_data import DataCleaning
 from data_processing.plot_data import DataPlotting
 from data_processing.stylized_table import stylized_table
 
-class RangeError(Exception):
-    pass
-
-try:
-    raise RangeError("value is out of range")
-except RangeError as e:
-    print(e)
-
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
 menu_with_redirect()
 
@@ -72,7 +64,7 @@ if bi_data is not None:
         )
         try:
             start_date, end_date = periodo
-        except RangeError:
+        except:
             st.error("É necessário selecionar um período válido")
             st.stop()
             
