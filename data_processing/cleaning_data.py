@@ -59,6 +59,7 @@ class DataCleaning:
         self._drop_columns()
         
         self.bi_dataframe = self.bi_dataframe[self.bi_dataframe['Peso (kg)'].isna() | (self.bi_dataframe['Peso (kg)'] <= 200)]
+        self.bi_dataframe = self.bi_dataframe[self.bi_dataframe['Peso (kg)'].isna() | (self.bi_dataframe['Peso (kg)'] >= 30)]
 
         cleaned_bi = self.bi_dataframe.copy()[
             [

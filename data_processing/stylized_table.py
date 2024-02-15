@@ -65,6 +65,6 @@ def stylized_statistics(table: pd.DataFrame):
         }, decimal=','
     )
     
-    stylized_statistics.apply(lambda x: ['color: #336699' if (x.name in ['Mediana', '3º Quartil'] and col in ['Atividade Administrada', 'Atividade Específica']) else '' for col in x.index], axis=1)
+    stylized_statistics.apply(lambda x: ['color: #038C33' if (x.name in ['Mediana', '3º Quartil'] and col in ['Atividade Administrada', 'Atividade Específica']) else '' for col in x.index], axis=1)
 
     return stylized_statistics

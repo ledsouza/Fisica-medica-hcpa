@@ -44,6 +44,7 @@ class DataPlotting:
             data=go.Scatter(
                 x=self.data["Número da Solicitação do Exame"],
                 y=self.data["Atividade Administrada"],
+                marker_color="#023E73",
                 mode="markers",
                 name="",
                 text=self.data["Código ID do Paciente"],
@@ -96,7 +97,7 @@ class DataPlotting:
             data=go.Histogram(
                 x=self.data["Atividade Administrada"],
                 histnorm='percent',
-                marker_color="#336699",
+                marker_color="#023E73",
                 showlegend=False,
                 name='',
                 hovertemplate="Atividade Administrada: %{x} mCi<br>Percentual: %{y:.2f}%",
@@ -127,6 +128,7 @@ class DataPlotting:
             data=go.Scatter(
                 x=self.data["Número da Solicitação do Exame"],
                 y=self.data["Dose (mSv)"],
+                marker_color="#023E73",
                 mode="markers",
                 name='',
                 text=self.data["Código ID do Paciente"],
@@ -178,7 +180,7 @@ class DataPlotting:
             data=go.Histogram(
                 x=self.data["Dose (mSv)"],
                 histnorm='percent',
-                marker_color="#336699",
+                marker_color="#023E73",
                 showlegend=False,
                 name='',
                 hovertemplate="Dose Recebida: %{x} mSv<br>Percentual: %{y:.2f}%",
