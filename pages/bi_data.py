@@ -1,9 +1,11 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 from io import BytesIO
 from menu import menu_with_redirect
 from data_processing.cleaning_data import DataCleaning
+from data_processing.filters import filters_bi
 from data_processing.plot_data import DataPlotting
 from data_processing.stylized_table import stylized_table
 
@@ -47,57 +49,12 @@ if bi_data is not None:
     
     bi_dataframe = load_data(bi_data, map_to_sheet_name[sheet_name])
 
-    # Cleaning the data
-    
+    # Cleaning the data   
     data_cleaner = DataCleaning(bi_dataframe)
     cleaned_bi = data_cleaner.clean_data()
     
-    # Filters
-    with st.sidebar:
-        st.markdown("<h1 style='text-align: center;'>Filtros</h1>", unsafe_allow_html=True)
-        
-        periodo = st.date_input(
-            label="Selecione o Período",
-            min_value=cleaned_bi["Data"].min(),
-            max_value=cleaned_bi["Data"].max(),
-            value=(cleaned_bi["Data"].min(), cleaned_bi["Data"].max()),
-        )
-        try:
-            start_date, end_date = periodo
-        except:
-            st.error("É necessário selecionar um período válido")
-            st.stop()
-            
-        atividade_administrada = st.slider('Selecione a Atividade Administrada', 0.0, cleaned_bi['Atividade Administrada'].max(), (0.0, cleaned_bi['Atividade Administrada'].max()))
-        dose = st.slider('Selecione a Dose', 0.0, cleaned_bi['Dose (mSv)'].max(), (0.0, cleaned_bi['Dose (mSv)'].max()))
-        if cleaned_bi['Peso (kg)'].isnull().all():
-            st.error("Não há dados de peso disponíveis para filtrar")
-        else:
-            peso = st.slider('Selecione o Peso', 0.0, cleaned_bi['Peso (kg)'].max(), (0.0, cleaned_bi['Peso (kg)'].max()))
-        idade = st.slider('Selecione a Idade', 0, cleaned_bi['Idade do paciente'].max(), (0, cleaned_bi['Idade do paciente'].max()))
-        sexo = st.multiselect("Selecione o Sexo", cleaned_bi['Sexo'].unique(), cleaned_bi['Sexo'].unique())
-        nome_sala = st.multiselect("Selecione a Sala", cleaned_bi['Nome da sala'].unique(), cleaned_bi['Nome da sala'].unique())
-    
-    if cleaned_bi['Peso (kg)'].isnull().all():
-        query = """
-        @periodo[0] <= Data <= @periodo[1] and \
-        @atividade_administrada[0] <= `Atividade Administrada` <= @atividade_administrada[1] and \
-        @dose[0] <= `Dose (mSv)` <= @dose[1] and \
-        @idade[0] <= `Idade do paciente` <= @idade[1] and \
-        Sexo in @sexo and \
-        `Nome da sala` in @nome_sala
-        """
-    else:  
-        query = """
-        @periodo[0] <= Data <= @periodo[1] and \
-        @atividade_administrada[0] <= `Atividade Administrada` <= @atividade_administrada[1] and \
-        @dose[0] <= `Dose (mSv)` <= @dose[1] and \
-        @peso[0] <= `Peso (kg)` <= @peso[1] and \
-        @idade[0] <= `Idade do paciente` <= @idade[1] and \
-        Sexo in @sexo and \
-        `Nome da sala` in @nome_sala
-        """
-    filtered_data = cleaned_bi.query(query)
+    # Filters   
+    filtered_data = filters_bi(cleaned_bi)
     
     # Download button
     @st.cache_data
