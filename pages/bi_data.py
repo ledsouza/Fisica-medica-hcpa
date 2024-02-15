@@ -8,7 +8,7 @@ from menu import menu_with_redirect
 from data_processing.cleaning_data import DataCleaning
 from data_processing.filters import filters_bi
 from data_processing.plot_data import DataPlotting
-from data_processing.stylized_table import stylized_table
+from data_processing.stylized_table import stylized_table, stylized_statistics
 
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
 # Open an image file
@@ -116,7 +116,21 @@ if bi_data is not None:
     with tab1:
         tableviz = stylized_table(filtered_df)
         st.dataframe(tableviz, use_container_width=True, hide_index=True)
-        #st.dataframe(cleaned_bi, use_container_width=True, hide_index=True)
+        
+        st.markdown('# Estatística Descritiva')
+        
+        if not filtered_df['Peso (kg)'].isnull().all():
+            descritive_statistics = stylized_statistics(filtered_df)
+            
+            st.dataframe(descritive_statistics, use_container_width=True)
+            
+            st.markdown('''
+                        <sup>**Observação**: O Nível de Referência Diagnóstica (DRL) pode ser definido como o terceiro quartil 
+                        ou mediana da atividade específica ou atividade administrada.
+                        <br>Todos os dados nulos são desconsiderados nesses cálculos.</sup>
+                        ''', unsafe_allow_html=True)
+        else:
+            st.error(f'Não há valores suficientes para calcular a estatística descritiva.')
         
     # Plotting the data
     plot = DataPlotting(filtered_df)

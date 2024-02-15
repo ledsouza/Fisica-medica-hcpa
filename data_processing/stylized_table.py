@@ -31,3 +31,40 @@ def stylized_table(table: pd.DataFrame):
     }, decimal=',')
     
     return tableviz_bi
+
+def stylized_statistics(table: pd.DataFrame):
+    descritive_statistics = table.copy()
+    descritive_statistics = descritive_statistics[['Idade do paciente', 
+                                                   'Peso (kg)', 
+                                                   'Atividade Administrada', 
+                                                   'Atividade específica (mCi/kg)', 
+                                                   'Dose (mSv)']]
+    descritive_statistics.rename(columns={
+        'Peso (kg)': 'Peso',
+        'Atividade específica (mCi/kg)': 'Atividade Específica',
+        'Dose (mSv)': 'Dose'
+    }, inplace=True)
+    descritive_statistics.dropna(inplace=True)
+    descritive_statistics = descritive_statistics.describe().rename(
+        index={'count': 'Contagem', 
+               'mean': 'Média', 
+               'std': 'Desvio Padrão', 
+               'min': 'Mínimo', 
+               '25%': '1º Quartil', 
+               '50%': 'Mediana', 
+               '75%': '3º Quartil', 
+               'max': 'Máximo'}
+    )
+    stylized_statistics = descritive_statistics.iloc[1:,:].style.format(
+        {
+            'Idade do paciente': '{:.0f}',
+            'Peso': '{:.2f} kg',
+            'Atividade Administrada': '{:.2f} mCi',
+            'Atividade Específica': '{:.6f} mCi/kg',
+            'Dose': '{:.2f} mSv'
+        }, decimal=','
+    )
+    
+    stylized_statistics.apply(lambda x: ['color: #336699' if (x.name in ['Mediana', '3º Quartil'] and col in ['Atividade Administrada', 'Atividade Específica']) else '' for col in x.index], axis=1)
+
+    return stylized_statistics
