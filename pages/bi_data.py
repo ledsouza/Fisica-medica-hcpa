@@ -137,5 +137,7 @@ if bi_data is not None:
     
     with tab2:
         plot.plot_atividade_administrada()
+        plot.hist_atividade_administrada()
     with tab3:
         plot.plot_dose()
+        plot.hist_dose()

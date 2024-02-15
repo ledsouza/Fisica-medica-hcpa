@@ -63,8 +63,7 @@ class DataPlotting:
                 tickvals=[],
                 fixedrange=True,
             ),
-            height=600,
-            width=1500
+            height=500
         )
 
         fig.add_shape(
@@ -87,6 +86,37 @@ class DataPlotting:
             line=dict(color="red", dash="dot"),
         )
         
+        st.plotly_chart(fig, use_container_width=True)
+        
+    def hist_atividade_administrada(self):
+        
+        title_text = f"Distribuição da Atividade Administrada<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
+        
+        fig = go.Figure(
+            data=go.Histogram(
+                x=self.data["Atividade Administrada"],
+                histnorm='percent',
+                marker_color="#336699",
+                showlegend=False,
+                name='',
+                hovertemplate="Atividade Administrada: %{x} mCi<br>Percentual: %{y:.2f}%",
+                textposition='outside',
+                texttemplate='%{y:.2f}%',
+                nbinsx = 30
+            )
+        )
+
+        fig.update_layout(
+            title=title_text,
+            title_font=dict(size=18),
+            xaxis_title="Atividade Administrada [mCi]",
+            yaxis_title="Percentual",
+            yaxis=dict(showticklabels=False, showgrid=False),
+            height=500
+        )
+
+        fig.update_traces(marker_line_width=1, marker_line_color="white")
+
         st.plotly_chart(fig, use_container_width=True)
         
     def plot_dose(self):
@@ -116,8 +146,7 @@ class DataPlotting:
                 tickvals=[],
                 fixedrange=True
             ),
-            height=600,
-            width=1500
+            height=500
         )
 
         fig.add_shape(
@@ -139,5 +168,35 @@ class DataPlotting:
             xref='paper',
             line=dict(color="red", dash="dot")
         )
+
+        st.plotly_chart(fig, use_container_width=True)
+        
+    def hist_dose(self):
+        title_text = f"Distribuição da Dose Recebida<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
+        
+        fig = go.Figure(
+            data=go.Histogram(
+                x=self.data["Dose (mSv)"],
+                histnorm='percent',
+                marker_color="#336699",
+                showlegend=False,
+                name='',
+                hovertemplate="Dose Recebida: %{x} mSv<br>Percentual: %{y:.2f}%",
+                textposition='outside',
+                texttemplate='%{y:.2f}%',
+                nbinsx=30
+            )
+        )
+
+        fig.update_layout(
+            title=title_text,
+            title_font=dict(size=18),
+            xaxis_title="Dose Recebida [mSv]",
+            yaxis_title="Percentual",
+            yaxis=dict(showticklabels=False, showgrid=False),
+            height=500
+        )
+
+        fig.update_traces(marker_line_width=1, marker_line_color="white")
 
         st.plotly_chart(fig, use_container_width=True)
