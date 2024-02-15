@@ -38,7 +38,7 @@ class DataPlotting:
 
     def plot_atividade_administrada(self): 
 
-        title_text = f"Atividade Administrada em cada solicitação de exame<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
+        title_text = f"Atividade administrada em cada solicitação de exame<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
 
         fig = go.Figure(
             data=go.Scatter(
@@ -57,7 +57,7 @@ class DataPlotting:
             title=title_text,
             title_font=dict(size=18),
             xaxis_title="",
-            yaxis_title="Atividade Administrada [mCi]",
+            yaxis_title="Atividade administrada [mCi]",
             xaxis=dict(
                 range=[0, self.data["Número da Solicitação do Exame"].max()],
                 tickmode="array",
@@ -91,7 +91,7 @@ class DataPlotting:
         
     def hist_atividade_administrada(self):
         
-        title_text = f"Distribuição da Atividade Administrada<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
+        title_text = f"Distribuição da atividade administrada<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
         
         fig = go.Figure(
             data=go.Histogram(
@@ -100,7 +100,7 @@ class DataPlotting:
                 marker_color="#023E73",
                 showlegend=False,
                 name='',
-                hovertemplate="Atividade Administrada: %{x} mCi<br>Percentual: %{y:.2f}%",
+                hovertemplate="Atividade administrada: %{x} mCi<br>Percentual: %{y:.2f}%",
                 textposition='outside',
                 texttemplate='%{y:.2f}%',
                 nbinsx = 30
@@ -110,7 +110,7 @@ class DataPlotting:
         fig.update_layout(
             title=title_text,
             title_font=dict(size=18),
-            xaxis_title="Atividade Administrada [mCi]",
+            xaxis_title="Atividade administrada [mCi]",
             yaxis_title="Percentual",
             yaxis=dict(showticklabels=False, showgrid=False),
             height=500
@@ -133,7 +133,7 @@ class DataPlotting:
                 name='',
                 text=self.data["Código ID do Paciente"],
                 customdata= np.stack((self.data["Atividade Administrada (str)"], self.data['Dose (str)']), axis=-1),
-                hovertemplate="<b>Código ID do Paciente</b>: %{text}<br><b>Atividade Administrada: %{customdata[0]} mCi<br>Dose: %{customdata[1]} mSv</b>"
+                hovertemplate="<b>Código ID do Paciente</b>: %{text}<br><b>Atividade administrada: %{customdata[0]} mCi<br>Dose: %{customdata[1]} mSv</b>"
             )
         )
 
@@ -174,7 +174,7 @@ class DataPlotting:
         st.plotly_chart(fig, use_container_width=True)
         
     def hist_dose(self):
-        title_text = f"Distribuição da Dose Recebida<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
+        title_text = f"Distribuição da dose recebida pelo paciente<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
         
         fig = go.Figure(
             data=go.Histogram(
@@ -183,7 +183,7 @@ class DataPlotting:
                 marker_color="#023E73",
                 showlegend=False,
                 name='',
-                hovertemplate="Dose Recebida: %{x} mSv<br>Percentual: %{y:.2f}%",
+                hovertemplate="Dose: %{x} mSv<br>Percentual: %{y:.2f}%",
                 textposition='outside',
                 texttemplate='%{y:.2f}%',
                 nbinsx=30
@@ -193,7 +193,7 @@ class DataPlotting:
         fig.update_layout(
             title=title_text,
             title_font=dict(size=18),
-            xaxis_title="Dose Recebida [mSv]",
+            xaxis_title="Dose [mSv]",
             yaxis_title="Percentual",
             yaxis=dict(showticklabels=False, showgrid=False),
             height=500
