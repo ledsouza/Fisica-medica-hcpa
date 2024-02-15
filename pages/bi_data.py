@@ -81,17 +81,19 @@ if bi_data is not None:
     
     col1, col2 = st.columns(2)
     with col1:
-        file_name = st.text_input("Prencha aqui o nome do arquivo para download", value="dados_tratados")
+        file_name = st.text_input("Prencha aqui o nome do arquivo para download", 
+                                  value="dados_tratados")
         
     with col2:
         st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
         if bi_data.name.endswith("csv"):
             st.download_button(
-                label="Baixar os dados tratados",
+                label=":arrow_down: Baixar os dados tratados",
                 data=convert_to_csv(filtered_df),
                 file_name=f"{file_name}.csv",
                 mime="text/csv",
-                type='primary'
+                type='primary',
+                help='A planilha baixada será referente ao exame selecionado'
             )
         else:
             buffer = BytesIO()
@@ -101,11 +103,12 @@ if bi_data is not None:
                 writer.close()
                 
                 st.download_button(
-                    label="Baixar os dados tratados",
+                    label=":arrow_down: Baixar os dados tratados",
                     data=buffer,
                     file_name=f"{file_name}.xlsx",
                     mime="application/vnd.ms-excel",
-                    type='primary'
+                    type='primary',
+                    help='A planilha baixada será referente ao exame selecionado'
                 )
     
     tab1, tab2, tab3 = st.tabs(["Tabela", "Atividade Administrada", "Dose"])

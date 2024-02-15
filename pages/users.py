@@ -1,11 +1,14 @@
 import streamlit as st
+from PIL import Image
 from menu import menu_with_redirect
 
+st.set_page_config(page_title="Gerenciamento de Usuários", layout="centered")
+# Open an image file
+img = Image.open('logos\Logo_SFMR_Horizontal_Centralizado.png')
+st.sidebar.image(img, use_column_width=True)
+
 menu_with_redirect()
-    
-############################################################################################################
-# ! FOR SOME REASON THIS PART OF THE CODE HAS BLANK PAGE WHEN RUNNING LOCALLY
-############################################################################################################
+
 tab1, tab2, tab3, tab4 = st.tabs(
     [
         "Redefinir senha",
