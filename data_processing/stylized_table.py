@@ -26,6 +26,7 @@ def stylized_table(table: pd.DataFrame):
     
     tableviz_bi = tableviz_bi.style.format({
         'Atividade Administrada': '{:.2f} mCi',
+        'Atividade Específica': '{:.2f} mCi/kg',
         'Peso': '{:.2f} kg',
         'Dose': '{:.2f} mSv'
     }, decimal=',')
@@ -60,7 +61,7 @@ def stylized_statistics(table: pd.DataFrame):
             'Idade do paciente': '{:.0f}',
             'Peso': '{:.2f} kg',
             'Atividade Administrada': '{:.2f} mCi',
-            'Atividade Específica': '{:.6f} mCi/kg',
+            'Atividade Específica': '{:.2f} mCi/kg',
             'Dose': '{:.2f} mSv'
         }, decimal=','
     )
