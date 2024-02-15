@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+from PIL import Image
 import plotly.graph_objects as go
 from io import BytesIO
 from menu import menu_with_redirect
@@ -10,6 +11,10 @@ from data_processing.plot_data import DataPlotting
 from data_processing.stylized_table import stylized_table
 
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
+# Open an image file
+img = Image.open('logos\Logo_SFMR_Horizontal_Centralizado.png')
+st.sidebar.image(img, use_column_width=True)
+
 menu_with_redirect()
 
 # Extracting the data
