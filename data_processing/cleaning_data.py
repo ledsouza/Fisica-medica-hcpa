@@ -50,6 +50,13 @@ class DataCleaning:
     def _drop_columns(self):
         self.bi_dataframe.drop(['Atividade Administrada NUMÉRICO', 'Atividade Administrada preenchida pelo USUÁRIO'], axis=1, inplace=True) 
 
+    def _remove_outliers(self):
+        self.bi_dataframe = self.bi_dataframe[self.bi_dataframe['Peso (kg)'].isna() | (self.bi_dataframe['Peso (kg)'] <= 200)]
+        self.bi_dataframe = self.bi_dataframe[self.bi_dataframe['Peso (kg)'].isna() | (self.bi_dataframe['Peso (kg)'] >= 30)]
+    
+    def _replace_sexo(self):
+        self.bi_dataframe['Sexo'] = self.bi_dataframe['Sexo'].replace('M', 'Masculino').replace('F', 'Feminino')
+    
     def clean_data(self):
         self._fill_data()
         self._cleaning_atividade_administrada()
@@ -57,9 +64,8 @@ class DataCleaning:
         self._drop_na()
         self._convert_to_correct_type()
         self._drop_columns()
-        
-        self.bi_dataframe = self.bi_dataframe[self.bi_dataframe['Peso (kg)'].isna() | (self.bi_dataframe['Peso (kg)'] <= 200)]
-        self.bi_dataframe = self.bi_dataframe[self.bi_dataframe['Peso (kg)'].isna() | (self.bi_dataframe['Peso (kg)'] >= 30)]
+        self._remove_outliers()
+        self._replace_sexo()
 
         cleaned_bi = self.bi_dataframe.copy()[
             [
