@@ -82,7 +82,7 @@ if bi_data is not None:
     col1, col2 = st.columns(2)
     with col1:
         file_name = st.text_input("Prencha aqui o nome do arquivo para download", 
-                                  value="dados_tratados")
+                                  value=f"{sheet_name} Tratado")
         
     with col2:
         st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
@@ -108,7 +108,7 @@ if bi_data is not None:
                     file_name=f"{file_name}.xlsx",
                     mime="application/vnd.ms-excel",
                     type='primary',
-                    help='A planilha baixada será referente ao exame selecionado'
+                    help='A planilha baixada será referente ao exame selecionado e com os filtros aplicados.'
                 )
     
     tab1, tab2, tab3 = st.tabs(["Tabela", "Atividade Administrada", "Dose"])
