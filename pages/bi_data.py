@@ -122,12 +122,12 @@ if bi_data is not None:
         if not filtered_df['Peso (kg)'].isnull().all():
             descritive_statistics = stylized_statistics(filtered_df)
             
-            st.dataframe(descritive_statistics, use_container_width=True)
+            st.markdown(descritive_statistics.to_html(), unsafe_allow_html=True)
             
             st.markdown('''
                         <sup>**Observação**: O Nível de Referência Diagnóstica (DRL) pode ser definido como o terceiro quartil 
-                        ou mediana da atividade específica ou atividade administrada.
-                        <br>Todos os dados nulos são desconsiderados nesses cálculos.</sup>
+                        ou mediana da atividade específica ou atividade administrada. <br>
+                        Todos os dados nulos são desconsiderados nos cálculos de estatística descritiva.</sup>
                         ''', unsafe_allow_html=True)
         else:
             st.error(f'Não há valores suficientes para calcular a estatística descritiva.')
