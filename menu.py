@@ -6,7 +6,7 @@ def authenticated_menu():
     st.sidebar.page_link("Home.py", label="Home")
     if st.session_state.authentication_status == True:
         st.sidebar.page_link("pages/users.py", label="Gerenciamento de Usuários")
-        st.sidebar.page_link("pages/bi_data.py", label="Tratamento de Dados do BI")
+        st.sidebar.page_link("pages/bi_data.py", label="Análise de Dados do BI")
         st.session_state['user_management'].logout_widget()
 
 

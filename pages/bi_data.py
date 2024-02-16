@@ -11,7 +11,7 @@ from data_processing.filters import filters_bi
 from data_processing.plot_data import DataPlotting
 from data_processing.stylized_table import stylized_table, stylized_statistics, stylized_correlation
 
-st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
+st.set_page_config(page_title="Análise de Dados do BI", layout="wide")
 # Open an image file
 img = Image.open('logos\Logo_SFMR_Horizontal_Centralizado.png')
 st.sidebar.image(img, use_column_width=True)
