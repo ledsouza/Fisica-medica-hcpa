@@ -155,9 +155,8 @@ if bi_data is not None:
             # Styling the correlation table
             s_correlation = stylized_correlation(df_correlation)
             
-            st.dataframe(s_correlation)
-            st.markdown("<sup>**Observação**: A categoria 'Sexo' foi transformada para numérico. <br>Masculino: 1<br>Feminino: 0</sup>", unsafe_allow_html=True)
-        
+            st.dataframe(s_correlation, use_container_width=True)
+            
             # Plotting the correlation
             tab1, tab2, tab3, tab4 = st.tabs(['Atividade Específica e Peso', 'Atividade Administrada e Peso', 'Atividade Específica e Dose', 'Atividade Administrada e Dose'])
             with tab1:
