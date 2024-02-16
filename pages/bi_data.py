@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import matplotlib
 from PIL import Image
 import plotly.graph_objects as go
 from io import BytesIO
@@ -8,7 +9,7 @@ from menu import menu_with_redirect
 from data_processing.cleaning_data import DataCleaning
 from data_processing.filters import filters_bi
 from data_processing.plot_data import DataPlotting
-from data_processing.stylized_table import stylized_table, stylized_statistics
+from data_processing.stylized_table import stylized_table, stylized_statistics, stylized_correlation
 
 st.set_page_config(page_title="Tratamento de Dados do BI", layout="wide")
 # Open an image file
@@ -111,7 +112,7 @@ if bi_data is not None:
                     help='A planilha baixada será referente ao exame selecionado e com os filtros aplicados.'
                 )
     
-    tab1, tab2, tab3 = st.tabs(["Tabela", "Atividade Administrada", "Dose"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Tabela", "Atividade Administrada", "Dose", "Teste de Correlação"])
     
     with tab1:
         tableviz = stylized_table(filtered_df)
@@ -133,11 +134,38 @@ if bi_data is not None:
             st.error(f'Não há valores suficientes para calcular a estatística descritiva.')
         
     # Plotting the data
-    plot = DataPlotting(filtered_df)
+    data_plotting = DataPlotting(filtered_df)
     
     with tab2:
-        plot.plot_atividade_administrada()
-        plot.hist_atividade_administrada()
+        data_plotting.plot_atividade_administrada()
+        data_plotting.hist_atividade_administrada()
     with tab3:
-        plot.plot_dose()
-        plot.hist_dose()
+        data_plotting.plot_dose()
+        data_plotting.hist_dose()
+        
+    with tab4:
+        # Processing for correlation
+        df_correlation = filtered_df[['Idade do paciente', 'Sexo', 'Peso (kg)', 'Atividade Administrada', 'Atividade específica (mCi/kg)', 'Dose (mSv)']].dropna()
+        
+        if df_correlation.isnull().all().all() or df_correlation.shape[0] < 2:
+            st.error('Não há valores suficientes para calcular a correlação.')
+        else:
+            df_correlation.replace({'Sexo': {'Masculino': 1, 'Feminino': 0}}, inplace=True)
+            
+            # Styling the correlation table
+            s_correlation = stylized_correlation(df_correlation)
+            
+            st.dataframe(s_correlation)
+            st.markdown("<sup>**Observação**: A categoria 'Sexo' foi transformada para numérico. <br>Masculino: 1<br>Feminino: 0</sup>", unsafe_allow_html=True)
+        
+            # Plotting the correlation
+            tab1, tab2, tab3, tab4 = st.tabs(['Atividade Específica e Peso', 'Atividade Administrada e Peso', 'Atividade Específica e Dose', 'Atividade Administrada e Dose'])
+            with tab1:
+                data_plotting.plot_correlation_atvs_peso(df_correlation)
+            with tab2:
+                data_plotting.plot_correlation_atv_peso(df_correlation)
+            with tab3:
+                data_plotting.plot_correlation_atvs_dose(df_correlation)
+            with tab4:
+                data_plotting.plot_correlation_atv_dose(df_correlation)
+            

@@ -56,7 +56,7 @@ def stylized_statistics(table: pd.DataFrame):
                '75%': '3º Quartil', 
                'max': 'Máximo'}
     )
-    stylized_statistics = descritive_statistics.iloc[1:,:].style.format(
+    s_statistics = descritive_statistics.iloc[1:,:].style.format(
         {
             'Idade do paciente': '{:.0f}',
             'Peso': '{:.2f} kg',
@@ -66,10 +66,21 @@ def stylized_statistics(table: pd.DataFrame):
         }, decimal=','
     )
     
-    stylized_statistics.apply(lambda x: ['color: #3FA63C' if (x.name in ['Mediana', '3º Quartil'] and col in ['Atividade Administrada', 'Atividade Específica']) else '' for col in x.index], axis=1)
-    stylized_statistics.set_table_styles([{
+    s_statistics.apply(lambda x: ['color: #3FA63C' if (x.name in ['Mediana', '3º Quartil'] and col in ['Atividade Administrada', 'Atividade Específica']) else '' for col in x.index], axis=1)
+    s_statistics.set_table_styles([{
         'selector': 'td,th',
         'props': 'text-align: center;'
     }], overwrite=False)
 
-    return stylized_statistics
+    return s_statistics
+
+def stylized_correlation(table: pd.DataFrame):
+    s_correlation = table.copy().rename(columns={
+        'Peso (kg)': 'Peso',
+        'Atividade específica (mCi/kg)': 'Atividade Específica',
+        'Dose (mSv)': 'Dose'
+    })
+    
+    s_correlation = s_correlation.corr().style.background_gradient(cmap='Greens', axis=None).format("{:.2f}")
+    
+    return s_correlation

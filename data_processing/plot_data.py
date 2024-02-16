@@ -14,6 +14,7 @@ class DataPlotting:
         viz_data = data.copy()
         viz_data['Atividade Administrada (str)'] = viz_data['Atividade Administrada'].apply(lambda x: f"{x:.2f}").str.replace('.', ',')
         viz_data['Dose (str)'] = viz_data['Dose (mSv)'].apply(lambda x: f"{x:.2f}").str.replace('.', ',')
+        viz_data['Atividade específica (str)'] = viz_data['Atividade específica (mCi/kg)'].apply(lambda x: f"{x:.2f}").str.replace('.', ',')
         return viz_data
     
     @staticmethod
@@ -57,7 +58,7 @@ class DataPlotting:
             title=title_text,
             title_font=dict(size=18),
             xaxis_title="",
-            yaxis_title="Atividade administrada [mCi]",
+            yaxis_title="Atividade administrada (mCi)",
             xaxis=dict(
                 range=[0, self.data["Número da Solicitação do Exame"].max()],
                 tickmode="array",
@@ -110,7 +111,7 @@ class DataPlotting:
         fig.update_layout(
             title=title_text,
             title_font=dict(size=18),
-            xaxis_title="Atividade administrada [mCi]",
+            xaxis_title="Atividade administrada (mCi)",
             yaxis_title="Percentual",
             yaxis=dict(showticklabels=False, showgrid=False),
             height=500
@@ -141,7 +142,7 @@ class DataPlotting:
             title=title_text,
             title_font=dict(size=18),
             xaxis_title="",
-            yaxis_title="Dose [mSv]",
+            yaxis_title="Dose (mSv)",
             xaxis=dict(
                 range=[0, self.data["Número da Solicitação do Exame"].max()],
                 tickmode="array",
@@ -193,7 +194,7 @@ class DataPlotting:
         fig.update_layout(
             title=title_text,
             title_font=dict(size=18),
-            xaxis_title="Dose [mSv]",
+            xaxis_title="Dose (mSv)",
             yaxis_title="Percentual",
             yaxis=dict(showticklabels=False, showgrid=False),
             height=500
@@ -201,4 +202,88 @@ class DataPlotting:
 
         fig.update_traces(marker_line_width=1, marker_line_color="white")
 
+        st.plotly_chart(fig, use_container_width=True)
+        
+    def plot_correlation_atvs_peso(self, df_correlation):
+        
+        title_text = f"Correlação entre Atividade Específica e Peso<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
+        
+        fig = go.Figure(data=go.Scatter(x=df_correlation['Peso (kg)'], 
+                                            y=df_correlation['Atividade específica (mCi/kg)'], 
+                                            mode='markers',
+                                            name='',
+                                            marker_color="#023E73",
+                                            customdata= np.stack((self.data["Atividade específica (str)"], self.data['Dose (str)']), axis=-1),
+                                            hovertemplate="<b>Atividade específica: %{customdata[0]} mCi/kg<br>Dose: %{customdata[1]} mSv</b>"
+                                            ))
+        
+        fig.update_layout(title=title_text, 
+                            xaxis_title='Peso (kg)', 
+                            yaxis_title='Atividade específica (mCi/kg)',
+                            xaxis=dict(range=[0, 200], fixedrange=True),
+                            )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    def plot_correlation_atv_peso(self, df_correlation):
+        
+        title_text = f"Correlação entre Atividade Administrada e Peso<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
+        
+        fig = go.Figure(data=go.Scatter(x=df_correlation['Peso (kg)'], 
+                                            y=df_correlation['Atividade Administrada'], 
+                                            mode='markers',
+                                            name='',
+                                            marker_color="#023E73",
+                                            customdata= np.stack((self.data["Atividade Administrada (str)"], self.data['Dose (str)']), axis=-1),
+                                            hovertemplate="<b>Atividade administrada: %{customdata[0]} mCi<br>Dose: %{customdata[1]} mSv</b>"
+                                            ))
+        
+        fig.update_layout(title=title_text, 
+                            xaxis_title='Peso (kg)', 
+                            yaxis_title='Atividade administrada (mCi)',
+                            xaxis=dict(range=[0, 200], fixedrange=True),
+                            )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    def plot_correlation_atv_dose(self, df_correlation):
+        
+        title_text = f"Correlação entre Atividade Administrada e Dose<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
+        
+        fig = go.Figure(data=go.Scatter(x=df_correlation['Atividade Administrada'], 
+                                            y=df_correlation['Dose (mSv)'], 
+                                            mode='markers',
+                                            name='',
+                                            marker_color="#023E73",
+                                            customdata= np.stack((self.data["Atividade Administrada (str)"], self.data['Dose (str)']), axis=-1),
+                                            hovertemplate="<b>Atividade administrada: %{customdata[0]} mCi<br>Dose: %{customdata[1]} mSv</b>"
+                                            ))
+        
+        fig.update_layout(title=title_text, 
+                            xaxis_title='Atividade administrada (mCi)', 
+                            yaxis_title='Dose (mSv)',
+                            xaxis=dict(range=[df_correlation['Atividade Administrada'].min(), df_correlation['Atividade Administrada'].max()], fixedrange=True),
+                            )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+    def plot_correlation_atvs_dose(self, df_correlation):
+        
+        title_text = f"Correlação entre Atividade Específica e Dose<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
+        
+        fig = go.Figure(data=go.Scatter(x=df_correlation['Atividade específica (mCi/kg)'], 
+                                            y=df_correlation['Dose (mSv)'], 
+                                            mode='markers',
+                                            name='',
+                                            marker_color="#023E73",
+                                            customdata= np.stack((self.data["Atividade específica (str)"], self.data['Dose (str)']), axis=-1),
+                                            hovertemplate="<b>Atividade específica: %{customdata[0]} mCi/kg<br>Dose: %{customdata[1]} mSv</b>"
+                                            ))
+        
+        fig.update_layout(title=title_text, 
+                            xaxis_title='Atividade específica (mCi/kg)', 
+                            yaxis_title='Dose (mSv)',
+                            xaxis=dict(range=[df_correlation['Atividade específica (mCi/kg)'].min(), df_correlation['Atividade específica (mCi/kg)'].max()], fixedrange=True),
+                            )
+        
         st.plotly_chart(fig, use_container_width=True)
