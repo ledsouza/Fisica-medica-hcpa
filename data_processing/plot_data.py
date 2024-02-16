@@ -6,7 +6,7 @@ import streamlit as st
 class DataPlotting:
     def __init__(self, data: pd.DataFrame):
         self.data = self._viz_data(data)
-        self.exame, self.atividade_max, self.atividade_min, self.dose_max, self.dose_min = self._extract_info(data)
+        self.exame, self.atividade_max, self.atividade_min, self.dose_max, self.dose_min, self.conversion_factor = self._extract_info(data)
         self.periodo = f"{self.data['Mês'].values[0]} de {self.data['Ano'].values[0]} a {self.data['Mês'].values[-1]} de {self.data['Ano'].values[-1]}"
     
     @staticmethod    
@@ -33,9 +33,10 @@ class DataPlotting:
         }
         atividade_max = info[exame][0]
         atividade_min = info[exame][1]
-        dose_max = atividade_max * info[exame][2]
-        dose_min = atividade_min * info[exame][2]
-        return exame, atividade_max, atividade_min, dose_max, dose_min
+        conversion_factor = info[exame][2]
+        dose_max = atividade_max * conversion_factor
+        dose_min = atividade_min * conversion_factor
+        return exame, atividade_max, atividade_min, dose_max, dose_min, conversion_factor
 
     def plot_atividade_administrada(self): 
 
@@ -122,8 +123,8 @@ class DataPlotting:
         st.plotly_chart(fig, use_container_width=True)
         
     def plot_dose(self):
-
-        title_text = f"Dose recebida pelo paciente em cada solicitação de exame<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
+        
+        title_text = f"Dose recebida pelo paciente em cada solicitação de exame<br><sup size=16>Paciente Adulto com idade acima de 18 anos | Fator de conversão: {self.conversion_factor:.2f}<br>Período: {self.periodo}</sup>".replace('.', ',')
 
         fig = go.Figure(
             data=go.Scatter(
@@ -175,7 +176,7 @@ class DataPlotting:
         st.plotly_chart(fig, use_container_width=True)
         
     def hist_dose(self):
-        title_text = f"Distribuição da dose recebida pelo paciente<br><sup size=16>Paciente Adulto com idade acima de 18 anos<br>Período: {self.periodo}</sup>"
+        title_text = f"Distribuição da dose recebida pelo paciente<br><sup size=16>Paciente Adulto com idade acima de 18 anos | Fator de conversão: {self.conversion_factor:.2f}<br>Período: {self.periodo}</sup>".replace('.', ',')
         
         fig = go.Figure(
             data=go.Histogram(
