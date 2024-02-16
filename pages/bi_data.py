@@ -59,6 +59,12 @@ if bi_data is not None:
                          Verifique a planilha selecionada e tente novamente.
                          ''')
                 st.stop()
+            except IndexError:
+                st.error('''
+                         Não há dados disponíveis para o exame selecionado.
+                         Verifique a planilha selecionada e tente novamente.
+                         ''')
+                st.stop()
             return bi_dataframe
 
     sheet_name = st.selectbox("Selecione o exame", exames)
