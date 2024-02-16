@@ -1,7 +1,5 @@
 import pandas as pd
 
-
-
 def stylized_table(table: pd.DataFrame):   
     tableviz_bi = table.copy()[['Data', 
                                 'Ano',
