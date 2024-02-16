@@ -26,7 +26,7 @@ exames = ['Cintilografia Óssea',
           'Cintilografia Miocárdica com Dipiridamol',
           'Cintilografia de Paratireoides',
           'Cintilografia para Determinação de Fluxo Renal',
-          ]
+          'Cintilografia Linfocintilografia']
 map_to_sheet_name = dict(zip(exames, ['Cintilografia Óssea',
                                       'Cintilografia Renal Estática (D',
                                       'Cintilografia Renal Dinâmica (D',
@@ -34,7 +34,8 @@ map_to_sheet_name = dict(zip(exames, ['Cintilografia Óssea',
                                       'Cintilografia Miocardica de Esf',
                                       'Cintilografia Miocardica de Dip',
                                       'Cintilografia de Paratireóides',
-                                      'Cintilografia para Determinação']))
+                                      'Cintilografia para Determinação',
+                                      'Cintilografia Linfocintilografi']))
 
 if bi_data is not None:
     @st.cache_data
