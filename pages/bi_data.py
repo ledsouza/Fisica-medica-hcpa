@@ -1,9 +1,6 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import matplotlib
 from PIL import Image
-import plotly.graph_objects as go
 from io import BytesIO
 from menu import menu_with_redirect
 from data_processing.cleaning_data import DataCleaning
