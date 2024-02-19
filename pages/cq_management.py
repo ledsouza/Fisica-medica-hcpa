@@ -4,7 +4,6 @@ from menu import menu_with_redirect
 import os
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-import requests
 import pandas as pd
 
 st.set_page_config(page_title="Gerência de Controle de Qualidade", layout="wide")
@@ -27,7 +26,6 @@ except Exception as e:
     print(e)
     
 db = client['cq_gestao']
-collection = db['testes']
 
 lista_testes_gc_periodicidade = {
     'Uniformidade intrínseca para alta densidade de contagem': 'Mensal',
@@ -46,7 +44,34 @@ lista_testes_gc_periodicidade = {
     'Resolução e linearidade espacial extrínseca': 'Anual'
 }
 
+def proximo_teste(nome, data):
+    periodicidade = lista_testes_gc_periodicidade[nome]
+    if periodicidade == 'Mensal':
+        return data + pd.DateOffset(months=1)
+    elif periodicidade == 'Semestral':
+        return data + pd.DateOffset(months=6)
+    elif periodicidade == 'Anual':
+        return data + pd.DateOffset(years=1)
 
+with st.form(key='insert_teste', clear_on_submit=True):
+    teste = {}
+    equipamentos_col = db['equipamentos']
+    equipamentos = equipamentos_col.find({}, {'_id': 0, 'Identificação': 1})
+    
+    teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_gc_periodicidade.keys()))
+    teste['Equipamento'] = st.selectbox('Equipamento', [equipamento['Identificação'] for equipamento in equipamentos])
+    teste['Data de realização'] = pd.to_datetime(st.date_input('Data de realização')).strftime("%d/%m/%Y")
+    teste['Data da próxima realização'] = proximo_teste(teste['Nome'], teste['Data de realização'])
+    teste['Arquivado'] = 'false'
+    
+    submit_button = st.form_submit_button(label='Inserir Teste')
+    if submit_button:
+        
+        st.write(teste)
+        # teste_col = db['testes']
+        # insert_status = teste_col.insert_one(teste)
+        # if insert_status.acknowledged:
+        #     st.success('Teste inserido com sucesso!')
 
 #collection.insert_one(teste)
 
