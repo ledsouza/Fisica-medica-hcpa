@@ -21,7 +21,7 @@ resource "google_secret_manager_secret" "access_key" {
 
 resource "google_secret_manager_secret_version" "access_key" {
   secret      = google_secret_manager_secret.access_key.id
-  secret_data = var.access_key
+  secret_data = var.access_key_value
 }
 
 resource "google_secret_manager_secret" "secret_access_key" {
@@ -33,7 +33,7 @@ resource "google_secret_manager_secret" "secret_access_key" {
 
 resource "google_secret_manager_secret_version" "secret_access_key" {
   secret      = google_secret_manager_secret.secret_access_key.id
-  secret_data = var.secret_access_key
+  secret_data = var.secret_access_key_value
 }
 
 resource "google_secret_manager_secret" "default_region" {
@@ -45,7 +45,7 @@ resource "google_secret_manager_secret" "default_region" {
 
 resource "google_secret_manager_secret_version" "default_region" {
   secret      = google_secret_manager_secret.default_region.id
-  secret_data = var.aws_region
+  secret_data = var.aws_region_value
 }
 
 resource "google_service_account" "account" {
