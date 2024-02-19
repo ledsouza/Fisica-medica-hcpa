@@ -6,7 +6,7 @@ from users_management import UsersManagement
 
 st.set_page_config(page_title="Home", layout="centered")
 # Open an image file
-img = Image.open('logos\Logo_SFMR_Horizontal_Centralizado.png')
+img = Image.open('Logo_SFMR_Horizontal_Centralizado.png')
 st.sidebar.image(img, use_column_width=True)
     
 user_management = UsersManagement()
