@@ -12,6 +12,21 @@ provider "google" {
   region  = "us-central1"
 }
 
+variable "aws_region_value" {
+  description = "The AWS region to deploy to"
+  type        = string
+}
+
+variable "access_key_value" {
+    description = "The AWS access key"
+    type        = string
+}
+
+variable "secret_access_key_value" {
+    description = "The AWS secret access key"
+    type        = string
+}
+
 resource "google_secret_manager_secret" "access_key" {
   secret_id = "access_key_id"
   replication {
