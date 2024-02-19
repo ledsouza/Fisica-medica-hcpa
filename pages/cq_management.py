@@ -29,14 +29,21 @@ except Exception as e:
 db = client['cq_gestao']
 collection = db['testes']
 
-lista_testes_periodicidade = {
+lista_testes_gc_periodicidade = {
     'Uniformidade intrínseca para alta densidade de contagem': 'Mensal',
+    'Resolução e linearidade espacial intrínseca': 'Mensal',
+    'Centro de rotação': 'Mensal',
+    'Resolução energética': 'Semestral',
+    'Taxa máxima de contagem': 'Semestral',
+    'Resolução espacial para fontes multi-energética': 'Semestral',
+    'Corregistro espacial para fontes multi-energéticas': 'Semestral',
+    'Sensibilidade planar': 'Semestral',
+    'Uniformidade extrínseca para alta densidade de contagem': 'Semestral',
+    'Velocidade da mesa em varreduras de corpo inteiro': 'Semestral',
+    'Desempenho geral SPECT': 'Semestral',
     'Uniformidade para nuclídeos diferentes de Tc-99m': 'Anual',
     'Uniformidade intrínseca com janelas energéticas assimétricas': 'Anual',
-    'Resolução e linearidade espacial intrínseca': 'Mensal',
-    'Resolução e linearidade espacial extrínseca': 'Mensal',
-    'Centro de rotação (SPECT)': 'Mensal',
-    'Resolução energética': 'Semestral'
+    'Resolução e linearidade espacial extrínseca': 'Anual'
 }
 
 teste = {
