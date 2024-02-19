@@ -4,6 +4,26 @@ cookie:
   name: random_cookie_name
 credentials:
   usernames:
+    acfischer:
+      email: acfischer@hcpa.edu.br
+      logged_in: false
+      name: "Andr\xE9ia Caroline Fischer da Silveira Fischer"
+      password: $2b$12$k5M8bMQR07/BkQom28MNt.N4uuWcmEGxn8DO5nDJRoGBqGfir8gJi
+    fernanda:
+      email: frdoliveira@hcpa.edu.br
+      logged_in: false
+      name: Fernanda Ramos de Oliveira
+      password: $2b$12$B1I39cz4iCDXHAVu9vhUEOOZE64c6QuESGag8QHt5NcGxOZnql1v.
+    jbsalazar:
+      email: jbsalazar@hcpa.edu.br
+      logged_in: false
+      name: Josiane Bueno Salazar
+      password: $2b$12$NFRUUtK7CIACv3CAZiWikObf4dLsjsSW1VajF1dQo6gP8W.LPATEC
+    jrdnascimento:
+      email: jrdnascimento@hcpa.edu.br
+      logged_in: false
+      name: "Joct\xE3 Ropke do Nascimento"
+      password: $2b$12$k87v1b/7JBsS5lSWHlzvyeFAV7hDFXr3sio40TqwYXu3ZEelyJ5C.
     ledsouza:
       email: ledsouza@hcpa.edu.br
       logged_in: true

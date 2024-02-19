@@ -60,9 +60,12 @@ with st.form(key='insert_teste', clear_on_submit=True):
     
     teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_gc_periodicidade.keys()))
     teste['Equipamento'] = st.selectbox('Equipamento', [equipamento['Identificação'] for equipamento in equipamentos])
-    teste['Data de realização'] = pd.to_datetime(st.date_input('Data de realização')).strftime("%d/%m/%Y")
+    teste['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
     teste['Data da próxima realização'] = proximo_teste(teste['Nome'], teste['Data de realização'])
     teste['Arquivado'] = 'false'
+    
+    teste['Data de realização'] = teste['Data de realização'].strftime('%d/%m/%Y')
+    teste['Data da próxima realização'] = teste['Data da próxima realização'].strftime('%d/%m/%Y')
     
     submit_button = st.form_submit_button(label='Inserir Teste')
     if submit_button:
