@@ -9,7 +9,7 @@ import pandas as pd
 
 st.set_page_config(page_title="Gerência de Controle de Qualidade", layout="wide")
 # Open an image file
-img = Image.open('logos\Logo_SFMR_Horizontal_Centralizado.png')
+img = Image.open('Logo_SFMR_Horizontal_Centralizado.png')
 st.sidebar.image(img, use_column_width=True)
 
 menu_with_redirect()
@@ -46,13 +46,7 @@ lista_testes_gc_periodicidade = {
     'Resolução e linearidade espacial extrínseca': 'Anual'
 }
 
-teste = {
-    'Nome': 'Centro de Rotação',
-    'Identificação': 'GC 1',
-    'Data da Realização': '14/02/2024',
-    'Data da Próxima Realização': '14/03/2024',
-    'Arquivado': 'false'
-}
+
 
 #collection.insert_one(teste)
 
