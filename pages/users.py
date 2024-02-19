@@ -4,7 +4,7 @@ from menu import menu_with_redirect
 
 st.set_page_config(page_title="Gerenciamento de Usuários", layout="centered")
 # Open an image file
-img = Image.open('logos\Logo_SFMR_Horizontal_Centralizado.png')
+img = Image.open('logos/Logo_SFMR_Horizontal_Centralizado.png')
 st.sidebar.image(img, use_column_width=True)
 
 menu_with_redirect()
