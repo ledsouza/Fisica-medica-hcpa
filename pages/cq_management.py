@@ -71,7 +71,7 @@ def proximo_teste(nome, data):
     elif periodicidade == 'Anual':
         return data + pd.DateOffset(years=1)
     
-tab1, tab2 = st.tabs(['Dashboard', 'Registrar Teste'])
+tab1, tab2, tab3 = st.tabs(['Dashboard', 'Registrar teste', 'Remover teste'])
 
 if 'teste_archivation' not in st.session_state:
     st.session_state.teste_archivation = False
@@ -118,8 +118,6 @@ with tab1:
             st.rerun()
         else:
             st.error('Erro ao atualizar o status de arquivamento!')
-
-        
     
 with tab2:
     teste = {}
@@ -154,11 +152,9 @@ with tab2:
                     time.sleep(1)
                     st.rerun()
 
-#collection.insert_one(teste)
-
-# Convert the collection data to a DataFrame
-# equipamentos_diagnostico = pd.DataFrame(list(collection.find()))
-
-# st.dataframe(equipamentos_diagnostico)
+with tab3:
+    with st.container(border=True):
+        
+    
 
 client.close()
