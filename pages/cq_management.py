@@ -29,36 +29,6 @@ except Exception as e:
     print(e)
     
 db = client['cq_gestao']
-
-lista_testes_gc_periodicidade = {
-    'Uniformidade intrínseca para alta densidade de contagem': 'Mensal',
-    'Resolução e linearidade espacial intrínseca': 'Mensal',
-    'Centro de rotação': 'Mensal',
-    'Resolução energética': 'Semestral',
-    'Taxa máxima de contagem': 'Semestral',
-    'Resolução espacial para fontes multi-energética': 'Semestral',
-    'Corregistro espacial para fontes multi-energéticas': 'Semestral',
-    'Sensibilidade planar': 'Semestral',
-    'Uniformidade extrínseca para alta densidade de contagem': 'Semestral',
-    'Velocidade da mesa em varreduras de corpo inteiro': 'Semestral',
-    'Desempenho geral SPECT': 'Semestral',
-    'Uniformidade para nuclídeos diferentes de Tc-99m': 'Anual',
-    'Uniformidade intrínseca com janelas energéticas assimétricas': 'Anual',
-    'Resolução e linearidade espacial extrínseca': 'Anual'
-}
-
-lista_testes_pet_periodicidade = {
-    'Uniformidade e verificação da calibração do sistema PET-CT': 'Mensal',
-    'Normalização e Calibração cruzada': 'Trimestral',
-    'Resolução espacial': 'Semestral',
-    'Sensibilidade': 'Semestral',
-    'Corregistro das imagens de PET e CT': 'Semestral',
-    '''Desempenho da taxa de contagens (NECR), 
-    taxa de eventos aleatórios, espalhados e verdadeiros, 
-    fração de espalhamento e 
-    exatidão das correções de eventos aleatórios e de perda de contagens''': 'Anual',
-    'Desempenho geral e exatidão das correções de atenuação e espalhamento': 'Anual',
-}
     
 tab1, tab2, tab3 = st.tabs(['Dashboard', 'Registrar teste', 'Remover teste'])
 
