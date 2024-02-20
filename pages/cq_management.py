@@ -152,8 +152,8 @@ with tab2:
                     time.sleep(1)
                     st.rerun()
 
-with tab3:
-    with st.container(border=True):
+# with tab3:
+#     with st.container(border=True):
         
     
 
