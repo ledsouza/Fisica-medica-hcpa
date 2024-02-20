@@ -1,4 +1,36 @@
 import pandas as pd
+from datetime import datetime, timedelta
+import streamlit as st
+
+class StylizedTable:
+    def __init__(self, table: pd.DataFrame) -> None:
+        self.table = table
+        
+class StylizedCQ(StylizedTable):
+    def __init__(self, table: pd.DataFrame) -> None:
+        super().__init__(table)
+        
+    def stylized_testes(self):
+        # Get the current date and time
+        current_datetime = datetime.now()
+        self.table.sort_values(by='Data da próxima realização', inplace=True)
+        self.table['Data da próxima realização'] = pd.to_datetime(self.table['Data da próxima realização'], format='%d/%m/%Y')
+        
+        def highlight_expired_dates(row):
+            
+            if row['Data da próxima realização'] - current_datetime >= timedelta(days=-30) and row['Data da próxima realização'] - current_datetime <= timedelta(days=0):
+                return ['background-color: #FFD700'] * len(row)
+            elif row['Data da próxima realização'] - current_datetime <= timedelta(days=-30):
+                return ['background-color: #FFA07A'] * len(row)
+            elif row['Data da próxima realização'] - current_datetime > timedelta(days=0):
+                return ['background-color: #90EE90'] * len(row)
+        
+        self.table = self.table.style.apply(highlight_expired_dates, axis=1)
+        self.table = self.table.format({
+            'Data da próxima realização': '{:%d/%m/%Y}'
+        })
+        
+        return self.table
 
 def stylized_table(table: pd.DataFrame):   
     tableviz_bi = table.copy()[['Data', 

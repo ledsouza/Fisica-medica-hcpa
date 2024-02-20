@@ -6,6 +6,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import pandas as pd
 import time
+from data_processing.stylized_table import StylizedCQ
 
 st.set_page_config(page_title="Gerência de Controle de Qualidade", layout="wide")
 # Open an image file
@@ -75,7 +76,17 @@ tab1, tab2 = st.tabs(['Dashboard', 'Registrar Teste'])
 with tab1:    
     teste_col = db['testes']
     testes = pd.DataFrame(list(teste_col.find({}, {'_id': 0})))
-    st.dataframe(testes, hide_index=True, use_container_width=True)
+    styler = StylizedCQ(testes)
+    stylized_table = styler.stylized_testes()
+    
+    edited_df = st.data_editor(stylized_table, hide_index=True, use_container_width=True, disabled=('Equipamento', 
+                                                                                                    'Nome', 
+                                                                                                    'Data de realização', 
+                                                                                                    'Data da próxima realização'))
+    archived_teste = edited_df[edited_df['Arquivado'] == True].drop(columns='Arquivado')
+    archived_teste = archived_teste.to_dict(orient='records')
+    #teste_col.update_one(archived_teste, {'$set': {'Arquivado': True}})
+    
 with tab2:
     teste = {}
     equipamentos_col = db['equipamentos']
