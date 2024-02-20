@@ -18,11 +18,11 @@ class StylizedCQ(StylizedTable):
         
         def highlight_expired_dates(row):
             
-            if row['Data da próxima realização'] - current_datetime >= timedelta(days=-30) and row['Data da próxima realização'] - current_datetime <= timedelta(days=0):
+            if row['Data da próxima realização'] - current_datetime >= timedelta(days=-30) and row['Data da próxima realização'] - current_datetime <= timedelta(days=0) and row['Arquivado'] == False:
                 return ['background-color: #FFD700'] * len(row)
-            elif row['Data da próxima realização'] - current_datetime <= timedelta(days=-30):
+            elif row['Data da próxima realização'] - current_datetime <= timedelta(days=-30) and row['Arquivado'] == False:
                 return ['background-color: #FFA07A'] * len(row)
-            elif row['Data da próxima realização'] - current_datetime > timedelta(days=0):
+            elif row['Data da próxima realização'] - current_datetime > timedelta(days=0) or row['Arquivado'] == True:
                 return ['background-color: #90EE90'] * len(row)
         
         self.table = self.table.style.apply(highlight_expired_dates, axis=1)
