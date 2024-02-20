@@ -43,6 +43,15 @@ class FormMongoDB():
         }
         return list_tests_pet_periodicity
     
+    def _set_curiometro_tests(self):
+        list_tests_curiometro_periodicity = {
+            'Reprodutibilidade': 'Mensal',
+            'Precisão e exatidão': 'Semestral',
+            'Linearidade': 'Semestral',
+            'Geometria': 'Anual'
+        }
+        return list_tests_curiometro_periodicity
+    
     def _next_test(self, name, date):
         list_tests_periodicity = {**self.list_tests_gc_periodicity, **self.list_tests_pet_periodicity}
         periodicity = list_tests_periodicity[name]
