@@ -61,9 +61,12 @@ lista_testes_pet_periodicidade = {
 
 
 def proximo_teste(nome, data):
-    periodicidade = lista_testes_gc_periodicidade[nome]
+    lista_testes_periodicidade = {**lista_testes_gc_periodicidade, **lista_testes_pet_periodicidade}
+    periodicidade = lista_testes_periodicidade[nome]
     if periodicidade == 'Mensal':
         return data + pd.DateOffset(months=1)
+    elif periodicidade == 'Trimestral':
+        return data + pd.DateOffset(months=3)
     elif periodicidade == 'Semestral':
         return data + pd.DateOffset(months=6)
     elif periodicidade == 'Anual':
@@ -76,27 +79,29 @@ with tab1:
     testes = pd.DataFrame(list(teste_col.find({}, {'_id': 0})))
     st.dataframe(testes, hide_index=True, use_container_width=True)
 with tab2:
+    teste = {}
+    equipamentos_col = db['equipamentos']
+    equipamentos = equipamentos_col.find({}, {'_id': 0, 'Identificação': 1})
+    
+    teste['Equipamento'] = st.selectbox('Equipamento', [equipamento['Identificação'] for equipamento in equipamentos])
+    
     with st.form(key='register_test', clear_on_submit=True):
-        teste = {}
-        equipamentos_col = db['equipamentos']
-        equipamentos = equipamentos_col.find({}, {'_id': 0, 'Identificação': 1})
-        
-        teste['Equipamento'] = st.selectbox('Equipamento', [equipamento['Identificação'] for equipamento in equipamentos])
         
         if teste['Equipamento'] in ['FMMNINFINIA', 'FMMNMILLENNIUM', 'FMMNVENTRI']:
             teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_gc_periodicidade.keys()))
-        elif teste['Equipamento'] in ['FMMNPETCT']:
+        elif teste['Equipamento'] == 'FMMNPETCT':
             teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_pet_periodicidade.keys()))
         
         teste['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
-        teste['Data da próxima realização'] = proximo_teste(teste['Nome'], teste['Data de realização'])
-        teste['Arquivado'] = False
-        
-        teste['Data de realização'] = teste['Data de realização'].strftime('%d/%m/%Y')
-        teste['Data da próxima realização'] = teste['Data da próxima realização'].strftime('%d/%m/%Y')
         
         submit_button = st.form_submit_button(label='Inserir Teste')
         if submit_button:
+            teste['Data da próxima realização'] = proximo_teste(teste['Nome'], teste['Data de realização'])
+            teste['Arquivado'] = False
+            
+            teste['Data de realização'] = teste['Data de realização'].strftime('%d/%m/%Y')
+            teste['Data da próxima realização'] = teste['Data da próxima realização'].strftime('%d/%m/%Y')
+            
             teste_col = db['testes']
             insert_status = teste_col.insert_one(teste)
             if insert_status.acknowledged:
