@@ -45,6 +45,21 @@ lista_testes_gc_periodicidade = {
     'Resolução e linearidade espacial extrínseca': 'Anual'
 }
 
+lista_testes_pet_periodicidade = {
+    'Uniformidade e verificação da calibração do sistema PET-CT': 'Mensal',
+    'Normalização e Calibração cruzada': 'Trimestral',
+    'Resolução espacial': 'Semestral',
+    'Sensibilidade': 'Semestral',
+    'Corregistro das imagens de PET e CT': 'Semestral',
+    '''Desempenho da taxa de contagens (NECR), 
+    taxa de eventos aleatórios, espalhados e verdadeiros, 
+    fração de espalhamento e 
+    exatidão das correções de eventos aleatórios e de perda de contagens''': 'Anual',
+    'Desempenho geral e exatidão das correções de atenuação e espalhamento': 'Anual',
+}
+
+
+
 def proximo_teste(nome, data):
     periodicidade = lista_testes_gc_periodicidade[nome]
     if periodicidade == 'Mensal':
@@ -61,13 +76,18 @@ with tab1:
     testes = pd.DataFrame(list(teste_col.find({}, {'_id': 0})))
     st.dataframe(testes, hide_index=True, use_container_width=True)
 with tab2:
-    with st.form(key='insert_teste', clear_on_submit=True):
+    with st.form(key='register_test', clear_on_submit=True):
         teste = {}
         equipamentos_col = db['equipamentos']
         equipamentos = equipamentos_col.find({}, {'_id': 0, 'Identificação': 1})
         
         teste['Equipamento'] = st.selectbox('Equipamento', [equipamento['Identificação'] for equipamento in equipamentos])
-        teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_gc_periodicidade.keys()))
+        
+        if teste['Equipamento'] in ['FMMNINFINIA', 'FMMNMILLENNIUM', 'FMMNVENTRI']:
+            teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_gc_periodicidade.keys()))
+        elif teste['Equipamento'] in ['FMMNPETCT']:
+            teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_pet_periodicidade.keys()))
+        
         teste['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
         teste['Data da próxima realização'] = proximo_teste(teste['Nome'], teste['Data de realização'])
         teste['Arquivado'] = False
