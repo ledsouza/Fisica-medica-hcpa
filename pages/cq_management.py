@@ -59,18 +59,6 @@ lista_testes_pet_periodicidade = {
     exatidão das correções de eventos aleatórios e de perda de contagens''': 'Anual',
     'Desempenho geral e exatidão das correções de atenuação e espalhamento': 'Anual',
 }
-
-def proximo_teste(nome, data):
-    lista_testes_periodicidade = {**lista_testes_gc_periodicidade, **lista_testes_pet_periodicidade}
-    periodicidade = lista_testes_periodicidade[nome]
-    if periodicidade == 'Mensal':
-        return data + pd.DateOffset(months=1)
-    elif periodicidade == 'Trimestral':
-        return data + pd.DateOffset(months=3)
-    elif periodicidade == 'Semestral':
-        return data + pd.DateOffset(months=6)
-    elif periodicidade == 'Anual':
-        return data + pd.DateOffset(years=1)
     
 tab1, tab2, tab3 = st.tabs(['Dashboard', 'Registrar teste', 'Remover teste'])
 
@@ -125,7 +113,5 @@ with tab2:
 
 with tab3:
     FormMongoDB(db).form_widget('removal')
-        
-    
 
 client.close()
