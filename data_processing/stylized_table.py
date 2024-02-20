@@ -13,8 +13,11 @@ class StylizedCQ(StylizedTable):
     def stylized_testes(self):
         # Get the current date and time
         current_datetime = datetime.now()
-        self.table.sort_values(by='Data da próxima realização', inplace=True)
         self.table['Data da próxima realização'] = pd.to_datetime(self.table['Data da próxima realização'], format='%d/%m/%Y')
+        self.table['due_diff'] = self.table['Data da próxima realização'] - current_datetime
+        self.table.sort_values(by='due_diff', inplace=True, ascending=True)
+        self.table.drop(columns='due_diff', inplace=True)
+        
         
         def highlight_expired_dates(row):
             
