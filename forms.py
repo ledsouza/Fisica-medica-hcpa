@@ -66,23 +66,23 @@ class FormMongoDB():
             with st.form(key='test_registration', clear_on_submit=True, border=False):
                 
                 if test['Equipamento'] in ['FMMNINFINIA', 'FMMNMILLENNIUM', 'FMMNVENTRI']:
-                    test['Nome'] = st.selectbox('Nome do Teste', list(self.list_tests_gc_periodicidade.keys()))
+                    test['Nome'] = st.selectbox('Nome do Teste', list(self.list_tests_gc_periodicity.keys()))
                 elif test['Equipamento'] == 'FMMNPETCT':
-                    test['Nome'] = st.selectbox('Nome do Teste', list(self.list_tests_pet_periodicidade.keys()))
+                    test['Nome'] = st.selectbox('Nome do Teste', list(self.list_tests_pet_periodicity.keys()))
                     
-            test['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
-            
-            submit_button = st.form_submit_button(label='Inserir Teste')
-            if submit_button:
-                test['Data da próxima realização'] = self._next_test(test['Nome'], test['Data de realização'])
-                test['Arquivado'] = False
+                test['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
                 
-                test['Data de realização'] = test['Data de realização'].strftime('%d/%m/%Y')
-                test['Data da próxima realização'] = test['Data da próxima realização'].strftime('%d/%m/%Y')
-                
-                self.collection = self.db['testes']
-                insert_status = self.collection.insert_one(test)
-                if insert_status.acknowledged:
-                    st.success('Teste inserido com sucesso!')
-                    time.sleep(1)
-                    st.rerun()
+                submit_button = st.form_submit_button(label='Inserir Teste')
+                if submit_button:
+                    test['Data da próxima realização'] = self._next_test(test['Nome'], test['Data de realização'])
+                    test['Arquivado'] = False
+                    
+                    test['Data de realização'] = test['Data de realização'].strftime('%d/%m/%Y')
+                    test['Data da próxima realização'] = test['Data da próxima realização'].strftime('%d/%m/%Y')
+                    
+                    self.collection = self.db['testes']
+                    insert_status = self.collection.insert_one(test)
+                    if insert_status.acknowledged:
+                        st.success('Teste inserido com sucesso!')
+                        time.sleep(1)
+                        st.rerun()

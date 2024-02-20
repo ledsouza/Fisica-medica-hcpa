@@ -7,6 +7,7 @@ from pymongo.server_api import ServerApi
 import pandas as pd
 import time
 from data_processing.stylized_table import StylizedCQ
+from forms import FormMongoDB
 
 st.set_page_config(page_title="Gerência de Controle de Qualidade", layout="wide")
 # Open an image file
@@ -120,37 +121,40 @@ with tab1:
             st.error('Erro ao atualizar o status de arquivamento!')
     
 with tab2:
-    teste = {}
-    equipamentos_col = db['equipamentos']
-    equipamentos = equipamentos_col.find({}, {'_id': 0, 'Identificação': 1})
     
-    with st.container(border=True):
+    FormMongoDB(db).test_registration()
     
-        teste['Equipamento'] = st.selectbox('Equipamento', [equipamento['Identificação'] for equipamento in equipamentos])
+    # teste = {}
+    # equipamentos_col = db['equipamentos']
+    # equipamentos = equipamentos_col.find({}, {'_id': 0, 'Identificação': 1})
+    
+    # with st.container(border=True):
+    
+    #     teste['Equipamento'] = st.selectbox('Equipamento', [equipamento['Identificação'] for equipamento in equipamentos])
         
-        with st.form(key='register_test', clear_on_submit=True, border=False):
+    #     with st.form(key='register_test', clear_on_submit=True, border=False):
             
-            if teste['Equipamento'] in ['FMMNINFINIA', 'FMMNMILLENNIUM', 'FMMNVENTRI']:
-                teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_gc_periodicidade.keys()))
-            elif teste['Equipamento'] == 'FMMNPETCT':
-                teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_pet_periodicidade.keys()))
+    #         if teste['Equipamento'] in ['FMMNINFINIA', 'FMMNMILLENNIUM', 'FMMNVENTRI']:
+    #             teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_gc_periodicidade.keys()))
+    #         elif teste['Equipamento'] == 'FMMNPETCT':
+    #             teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_pet_periodicidade.keys()))
             
-            teste['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
+    #         teste['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
             
-            submit_button = st.form_submit_button(label='Inserir Teste')
-            if submit_button:
-                teste['Data da próxima realização'] = proximo_teste(teste['Nome'], teste['Data de realização'])
-                teste['Arquivado'] = False
+    #         submit_button = st.form_submit_button(label='Inserir Teste')
+    #         if submit_button:
+    #             teste['Data da próxima realização'] = proximo_teste(teste['Nome'], teste['Data de realização'])
+    #             teste['Arquivado'] = False
                 
-                teste['Data de realização'] = teste['Data de realização'].strftime('%d/%m/%Y')
-                teste['Data da próxima realização'] = teste['Data da próxima realização'].strftime('%d/%m/%Y')
+    #             teste['Data de realização'] = teste['Data de realização'].strftime('%d/%m/%Y')
+    #             teste['Data da próxima realização'] = teste['Data da próxima realização'].strftime('%d/%m/%Y')
                 
-                teste_col = db['testes']
-                insert_status = teste_col.insert_one(teste)
-                if insert_status.acknowledged:
-                    st.success('Teste inserido com sucesso!')
-                    time.sleep(1)
-                    st.rerun()
+    #             teste_col = db['testes']
+    #             insert_status = teste_col.insert_one(teste)
+    #             if insert_status.acknowledged:
+    #                 st.success('Teste inserido com sucesso!')
+    #                 time.sleep(1)
+    #                 st.rerun()
 
 # with tab3:
 #     with st.container(border=True):
