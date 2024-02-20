@@ -73,19 +73,53 @@ def proximo_teste(nome, data):
     
 tab1, tab2 = st.tabs(['Dashboard', 'Registrar Teste'])
 
+if 'teste_archivation' not in st.session_state:
+    st.session_state.teste_archivation = False
+
+def change_archive_status():
+    st.session_state.teste_archivation = True
+
 with tab1:    
     teste_col = db['testes']
     testes = pd.DataFrame(list(teste_col.find({}, {'_id': 0})))
     styler = StylizedCQ(testes)
     stylized_table = styler.stylized_testes()
     
-    edited_df = st.data_editor(stylized_table, hide_index=True, use_container_width=True, disabled=('Equipamento', 
+    edited_df = st.data_editor(stylized_table, hide_index=True, use_container_width=True, on_change=change_archive_status, disabled=('Equipamento', 
                                                                                                     'Nome', 
                                                                                                     'Data de realização', 
                                                                                                     'Data da próxima realização'))
-    archived_teste = edited_df[edited_df['Arquivado'] == True].drop(columns='Arquivado')
-    archived_teste = archived_teste.to_dict(orient='records')
-    #teste_col.update_one(archived_teste, {'$set': {'Arquivado': True}})
+    
+    if st.session_state.teste_archivation:
+        st.session_state.teste_archivation = False
+        
+        diff = testes.compare(edited_df)
+        
+        # Drop the multi-index to make filtering easier
+        diff.columns = diff.columns.droplevel(0)
+        
+        # Get the indices of the rows with differences
+        diff_indices = diff[diff['self'].notna() | diff['other'].notna()].index
+        
+        # Get the entire rows from the original dataframe
+        diff_rows = testes.loc[diff_indices]
+        query = diff_rows.drop(columns='Arquivado')
+        query['Data da próxima realização'] = query['Data da próxima realização'].dt.strftime('%d/%m/%Y')
+        query = query.to_dict('records')
+        
+        # Get only the archivation status with differences
+        diff_value = diff['other']
+        archived_status = {'Arquivado': diff_value.values[0]}
+        
+        update_status = teste_col.update_one(query[0], {'$set': archived_status})
+        if update_status.matched_count > 0:
+            st.success('Status de arquivamento atualizado com sucesso!')
+            time.sleep(1)
+            st.rerun()
+        else:
+            st.error('Erro ao atualizar o status de arquivamento!')
+
+        
     
 with tab2:
     teste = {}
