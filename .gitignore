@@ -4,3 +4,4 @@ secrets.toml
 .env
 *.tfstate
 *.tfvars
+notebooks/
