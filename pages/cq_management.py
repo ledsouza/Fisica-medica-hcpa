@@ -58,8 +58,6 @@ lista_testes_pet_periodicidade = {
     'Desempenho geral e exatidão das correções de atenuação e espalhamento': 'Anual',
 }
 
-
-
 def proximo_teste(nome, data):
     lista_testes_periodicidade = {**lista_testes_gc_periodicidade, **lista_testes_pet_periodicidade}
     periodicidade = lista_testes_periodicidade[nome]
@@ -83,31 +81,33 @@ with tab2:
     equipamentos_col = db['equipamentos']
     equipamentos = equipamentos_col.find({}, {'_id': 0, 'Identificação': 1})
     
-    teste['Equipamento'] = st.selectbox('Equipamento', [equipamento['Identificação'] for equipamento in equipamentos])
+    with st.container(border=True):
     
-    with st.form(key='register_test', clear_on_submit=True):
+        teste['Equipamento'] = st.selectbox('Equipamento', [equipamento['Identificação'] for equipamento in equipamentos])
         
-        if teste['Equipamento'] in ['FMMNINFINIA', 'FMMNMILLENNIUM', 'FMMNVENTRI']:
-            teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_gc_periodicidade.keys()))
-        elif teste['Equipamento'] == 'FMMNPETCT':
-            teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_pet_periodicidade.keys()))
-        
-        teste['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
-        
-        submit_button = st.form_submit_button(label='Inserir Teste')
-        if submit_button:
-            teste['Data da próxima realização'] = proximo_teste(teste['Nome'], teste['Data de realização'])
-            teste['Arquivado'] = False
+        with st.form(key='register_test', clear_on_submit=True, border=False):
             
-            teste['Data de realização'] = teste['Data de realização'].strftime('%d/%m/%Y')
-            teste['Data da próxima realização'] = teste['Data da próxima realização'].strftime('%d/%m/%Y')
+            if teste['Equipamento'] in ['FMMNINFINIA', 'FMMNMILLENNIUM', 'FMMNVENTRI']:
+                teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_gc_periodicidade.keys()))
+            elif teste['Equipamento'] == 'FMMNPETCT':
+                teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_pet_periodicidade.keys()))
             
-            teste_col = db['testes']
-            insert_status = teste_col.insert_one(teste)
-            if insert_status.acknowledged:
-                st.success('Teste inserido com sucesso!')
-                time.sleep(1)
-                st.rerun()
+            teste['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
+            
+            submit_button = st.form_submit_button(label='Inserir Teste')
+            if submit_button:
+                teste['Data da próxima realização'] = proximo_teste(teste['Nome'], teste['Data de realização'])
+                teste['Arquivado'] = False
+                
+                teste['Data de realização'] = teste['Data de realização'].strftime('%d/%m/%Y')
+                teste['Data da próxima realização'] = teste['Data da próxima realização'].strftime('%d/%m/%Y')
+                
+                teste_col = db['testes']
+                insert_status = teste_col.insert_one(teste)
+                if insert_status.acknowledged:
+                    st.success('Teste inserido com sucesso!')
+                    time.sleep(1)
+                    st.rerun()
 
 #collection.insert_one(teste)
 
