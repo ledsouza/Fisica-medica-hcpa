@@ -5,6 +5,7 @@ import os
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import pandas as pd
+import time
 
 st.set_page_config(page_title="Gerência de Controle de Qualidade", layout="wide")
 # Open an image file
@@ -80,6 +81,7 @@ with tab2:
             insert_status = teste_col.insert_one(teste)
             if insert_status.acknowledged:
                 st.success('Teste inserido com sucesso!')
+                time.sleep(1)
                 st.rerun()
 
 #collection.insert_one(teste)
