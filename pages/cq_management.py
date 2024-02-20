@@ -52,29 +52,35 @@ def proximo_teste(nome, data):
         return data + pd.DateOffset(months=6)
     elif periodicidade == 'Anual':
         return data + pd.DateOffset(years=1)
+    
+tab1, tab2 = st.tabs(['Dashboard', 'Registrar Teste'])
 
-with st.form(key='insert_teste', clear_on_submit=True):
-    teste = {}
-    equipamentos_col = db['equipamentos']
-    equipamentos = equipamentos_col.find({}, {'_id': 0, 'Identificação': 1})
-    
-    teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_gc_periodicidade.keys()))
-    teste['Equipamento'] = st.selectbox('Equipamento', [equipamento['Identificação'] for equipamento in equipamentos])
-    teste['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
-    teste['Data da próxima realização'] = proximo_teste(teste['Nome'], teste['Data de realização'])
-    teste['Arquivado'] = 'false'
-    
-    teste['Data de realização'] = teste['Data de realização'].strftime('%d/%m/%Y')
-    teste['Data da próxima realização'] = teste['Data da próxima realização'].strftime('%d/%m/%Y')
-    
-    submit_button = st.form_submit_button(label='Inserir Teste')
-    if submit_button:
+with tab1:    
+    teste_col = db['testes']
+    testes = pd.DataFrame(list(teste_col.find({}, {'_id': 0})))
+    st.dataframe(testes, hide_index=True, use_container_width=True)
+with tab2:
+    with st.form(key='insert_teste', clear_on_submit=True):
+        teste = {}
+        equipamentos_col = db['equipamentos']
+        equipamentos = equipamentos_col.find({}, {'_id': 0, 'Identificação': 1})
         
-        st.write(teste)
-        # teste_col = db['testes']
-        # insert_status = teste_col.insert_one(teste)
-        # if insert_status.acknowledged:
-        #     st.success('Teste inserido com sucesso!')
+        teste['Equipamento'] = st.selectbox('Equipamento', [equipamento['Identificação'] for equipamento in equipamentos])
+        teste['Nome'] = st.selectbox('Nome do Teste', list(lista_testes_gc_periodicidade.keys()))
+        teste['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
+        teste['Data da próxima realização'] = proximo_teste(teste['Nome'], teste['Data de realização'])
+        teste['Arquivado'] = False
+        
+        teste['Data de realização'] = teste['Data de realização'].strftime('%d/%m/%Y')
+        teste['Data da próxima realização'] = teste['Data da próxima realização'].strftime('%d/%m/%Y')
+        
+        submit_button = st.form_submit_button(label='Inserir Teste')
+        if submit_button:
+            teste_col = db['testes']
+            insert_status = teste_col.insert_one(teste)
+            if insert_status.acknowledged:
+                st.success('Teste inserido com sucesso!')
+                st.rerun()
 
 #collection.insert_one(teste)
 
