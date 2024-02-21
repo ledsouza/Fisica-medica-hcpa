@@ -15,7 +15,7 @@ class StylizedCQ(StylizedTable):
         current_datetime = datetime.now()
         self.table['Data da próxima realização'] = pd.to_datetime(self.table['Data da próxima realização'], format='%d/%m/%Y')
         self.table['due_diff'] = self.table['Data da próxima realização'] - current_datetime
-        self.table.sort_values(by=['Arquivado', 'due_diff'], inplace=True, ascending=[False, True])
+        self.table.sort_values(by=['Arquivado', 'due_diff'], inplace=True, ascending=[True, True])
         self.table.drop(columns='due_diff', inplace=True)
         
         def highlight_expired_dates(row):
