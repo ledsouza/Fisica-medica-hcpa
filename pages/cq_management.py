@@ -19,7 +19,7 @@ menu_with_redirect()
 uri = f"mongodb+srv://ledsouza:{os.getenv('MONGODB_PASSWORD')}@mnmanagement.opks2ne.mongodb.net/?retryWrites=true&w=majority"
 
 # Create a new client and connect to the server
-client = MongoClient(uri, server_api=ServerApi('1'))
+client = MongoClient(uri, server_api=ServerApi('1'), maxIdleTimeMS=60000*10)
 
 # Send a ping to confirm a successful connection
 try:
@@ -74,14 +74,15 @@ with tab2:
         if update_status.matched_count > 0:
             st.success('Status de arquivamento atualizado com sucesso!')
             time.sleep(1)
+            client.close()
             st.rerun()
         else:
             st.error('Erro ao atualizar o status de arquivamento!')
     
 with tab3:
-    FormMongoDB(db).form_widget('registration')
+    FormMongoDB(client).form_widget('registration')
 
 with tab4:
-    FormMongoDB(db).form_widget('removal')
+    FormMongoDB(client).form_widget('removal')
 
 client.close()

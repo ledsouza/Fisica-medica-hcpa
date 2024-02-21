@@ -3,8 +3,9 @@ import pandas as pd
 import time
         
 class FormMongoDB():
-    def __init__(self, db) -> None:
-        self.db = db
+    def __init__(self, client) -> None:
+        self.client = client
+        self.db = client['cq_gestao']
         self.collection = None
         self.list_tests_gc_periodicity = self._set_gc_tests()
         self.list_tests_pet_periodicity = self._set_pet_tests()
@@ -147,12 +148,14 @@ class FormMongoDB():
                         if insert_status.acknowledged:
                             st.success('Teste inserido com sucesso!')
                             time.sleep(1)
+                            self.client.close()
                             st.rerun()
                     elif type_form == 'removal':
                         removal_status = self.collection.delete_one(test)
                         if removal_status.deleted_count > 0:
                             st.success('Teste removido com sucesso!')
                             time.sleep(1)
+                            self.client.close()
                             st.rerun()
                         else:
                             st.error('Erro ao remover o teste!')
