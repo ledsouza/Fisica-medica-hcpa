@@ -16,18 +16,24 @@ class FormMongoDB():
         list_tests_gc_periodicity = {
             'Uniformidade intrínseca para alta densidade de contagem': 'Mensal',
             'Resolução e linearidade espacial intrínseca': 'Mensal',
-            'Centro de rotação': 'Mensal',
+            'Centro de rotação LEHR': 'Mensal',
+            'Centro de rotação MEGP': 'Mensal',
+            'Centro de rotação HEGP': 'Mensal',
             'Resolução energética': 'Semestral',
             'Taxa máxima de contagem': 'Semestral',
             'Resolução espacial para fontes multi-energética': 'Semestral',
             'Corregistro espacial para fontes multi-energéticas': 'Semestral',
             'Sensibilidade planar': 'Semestral',
-            'Uniformidade extrínseca para alta densidade de contagem': 'Semestral',
+            'Uniformidade extrínseca para alta densidade de contagem LEHR': 'Semestral',
+            'Uniformidade extrínseca para alta densidade de contagem MEGP': 'Semestral',
+            'Uniformidade extrínseca para alta densidade de contagem HEGP': 'Semestral',
             'Velocidade da mesa em varreduras de corpo inteiro': 'Semestral',
-            'Desempenho geral SPECT': 'Semestral',
+            'Desempenho geral do sistema SPECT': 'Semestral',
             'Uniformidade para nuclídeos diferentes de Tc-99m': 'Anual',
             'Uniformidade intrínseca com janelas energéticas assimétricas': 'Anual',
-            'Resolução e linearidade espacial extrínseca': 'Anual'
+            'Resolução e linearidade espacial extrínseca LEHR': 'Anual',
+            'Resolução e linearidade espacial extrínseca MEGP': 'Anual',
+            'Resolução e linearidade espacial extrínseca HEGP': 'Anual'
         }
         return list_tests_gc_periodicity
     
