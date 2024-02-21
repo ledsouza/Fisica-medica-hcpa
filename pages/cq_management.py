@@ -30,7 +30,7 @@ except Exception as e:
     
 db = client['cq_gestao']
     
-tab1, tab2, tab3 = st.tabs(['Dashboard', 'Registrar teste', 'Remover teste'])
+tab1, tab2, tab3 = st.tabs(['Arquivamento', 'Registrar teste', 'Remover teste'])
 
 if 'teste_archivation' not in st.session_state:
     st.session_state.teste_archivation = False
