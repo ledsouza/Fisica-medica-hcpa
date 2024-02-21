@@ -63,7 +63,7 @@ with tab2:
         # Get the entire rows from the original dataframe
         diff_rows = testes.loc[diff_indices]
         query = diff_rows.drop(columns='Arquivado')
-        query['Data da próxima realização'] = query['Data da próxima realização'].dt.strftime('%d/%m/%Y')
+        query['Data de realização'] = query['Data de realização'].dt.strftime('%d/%m/%Y')
         query = query.to_dict('records')
         
         # Get only the archivation status with differences
