@@ -40,7 +40,7 @@ class FormMongoDB():
             'Verificação da angulação dos furos MEGP': 'Semestral',
             'Verificação da angulação dos furos HEGP': 'Semestral',
             'Velocidade da mesa em varreduras de corpo inteiro': 'Semestral',
-            'Desempenho geral do sistema SPECT': 'Semestral',
+            'Desempenho geral da câmara SPECT': 'Semestral',
             'Uniformidade íntrinseca para I-131': 'Anual',
             'Uniformidade íntrinseca para Ga-67': 'Anual',
             'Uniformidade íntrinseca para Tl-201': 'Anual',
