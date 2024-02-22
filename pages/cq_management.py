@@ -95,7 +95,7 @@ with indicadores:
             }
         ]
         distinct_years = collection.aggregate(pipeline)
-        years = sorted([year['_id'] for year in distinct_years])
+        years = sorted([year['_id'] for year in distinct_years])[1:]
         current_year = datetime.now().year
         year = st.selectbox('Selecione o ano', years, index=years.index(current_year))
     
@@ -130,14 +130,6 @@ with indicadores:
             "$lt": end_period
         }
     }
-    # query = {
-    #     "$expr": {
-    #         "$and": [
-    #             {"$eq": [{"$year": "$Data da próxima realização"}, year]},
-    #             {"$eq": [{"$month": "$Data da próxima realização"}, month]}
-    #         ]
-    #     }
-    # }
     tests_to_due = collection.find(query, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1}).sort('Data da próxima realização', pymongo.DESCENDING)
 
     tests_to_do_current_month = pd.DataFrame()
