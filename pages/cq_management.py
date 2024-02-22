@@ -68,9 +68,13 @@ except Exception as e:
     
 db = client['cq_gestao']
     
-tab1, tab2, tab3, tab4 = st.tabs(['Dashboard', 'Arquivamento', 'Registrar teste', 'Remover teste'])
+indicadores, panorama_ano, arquivamento, registrar_teste, remover_teste = st.tabs(['Indicadores',
+                                                                                   'Panorama do ano',
+                                                                                   'Arquivamento',
+                                                                                   'Registrar teste',
+                                                                                   'Remover teste'])
 
-with tab1:
+with indicadores:
     collection = db['testes']
     
     col1, col2 = st.columns(2)
@@ -143,7 +147,7 @@ if 'teste_archivation' not in st.session_state:
 def change_archive_status():
     st.session_state.teste_archivation = True
 
-with tab2:    
+with arquivamento:    
     teste_col = db['testes']
     testes = pd.DataFrame(list(teste_col.find({}, {'_id': 0})))
     styler = StylizedCQ(testes)
@@ -184,10 +188,10 @@ with tab2:
         else:
             st.error('Erro ao atualizar o status de arquivamento!')
     
-with tab3:
+with registrar_teste:
     FormMongoDB(client).form_widget('registration')
 
-with tab4:
+with remover_teste:
     FormMongoDB(client).form_widget('removal')
 
 client.close()
