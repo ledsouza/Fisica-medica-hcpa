@@ -83,7 +83,8 @@ with indicadores:
         years = collection.find().distinct('Data da próxima realização')
         years = set([year[-4:] for year in years])
         years = sorted(years, reverse=True)
-        year = st.selectbox('Selecione o ano', years)
+        current_year = str(datetime.now().year)
+        year = st.selectbox('Selecione o ano', years, index=years.index(current_year))
     
     with col2:
         months = {
