@@ -176,13 +176,37 @@ with indicadores:
             continue
     tests_to_do_current_month.drop(columns='diff', inplace=True)
     
-    total_due = len(tests_to_do_current_month)
-    total_tests = len(tests_to_due_current_month)
-    meta = total_tests / (total_due + total_tests)
-    st.dataframe(tests_to_do_current_month, use_container_width=True)
+    
+    
+    tests_to_do_current_month['Sem material'] = False
+    tests_to_do_current_month.rename(columns={'Data de realização': 'Data da última realização', 'Data da próxima realização': 'Data de realização esperada'}, inplace=True)
+    s_tests_to_do_current_month = tests_to_do_current_month.drop(columns='Arquivado').style
+    s_tests_to_do_current_month.format(
+        {
+            'Data da última realização': '{:%d/%m/%Y}',
+            'Data de realização esperada': '{:%d/%m/%Y}'
+        }
+    )
+    
+    edited_tests_to_do_current_month = st.data_editor(s_tests_to_do_current_month, 
+                                                      use_container_width=True, 
+                                                      hide_index=True,  
+                                                      disabled=('Equipamento',
+                                                                'Nome',
+                                                                'Data da última realização',
+                                                                'Data de realização esperada'
+                                                                ))
 
-    st.write(f'Total de testes para realizar: {total_due}')
-    st.write(f'Meta de realização: {meta:.2%}')
+    total_due = len(edited_tests_to_do_current_month[edited_tests_to_do_current_month['Sem material'] == False])
+    total_tests = len(tests_to_due_current_month)
+        
+    meta = total_tests / (total_due + total_tests) * 100
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric(label='Total de testes para realizar', value=f'{total_due}')
+    with col2:
+        st.metric(label='Indicador do Controle de Qualidade', value=f'{meta:.2f}%')
     
 
 if 'teste_archivation' not in st.session_state:
