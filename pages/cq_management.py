@@ -4,11 +4,15 @@ from menu import menu_with_redirect
 import os
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+import pymongo
 import pandas as pd
 import time
 from data_processing.stylized_table import StylizedCQ
 from forms import FormMongoDB
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from tests_periodicity import map_gc_periodicity
+import numpy as np
 
 list_tests_gc_periodicity = {
     'Uniformidade intrínseca para alta densidade de contagem': 'Mensal',
@@ -80,66 +84,113 @@ with indicadores:
     col1, col2 = st.columns(2)
     
     with col1:
-        years = collection.find().distinct('Data da próxima realização')
-        years = set([year[-4:] for year in years])
-        years = sorted(years, reverse=True)
-        current_year = str(datetime.now().year)
+        pipeline = [
+            {
+                "$project": {
+                    "year": {"$year": "$Data da próxima realização"}
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$year"
+                }
+            }
+        ]
+        distinct_years = collection.aggregate(pipeline)
+        years = sorted([year['_id'] for year in distinct_years])
+        current_year = datetime.now().year
         year = st.selectbox('Selecione o ano', years, index=years.index(current_year))
     
     with col2:
         months = {
-            'Janeiro': '01',
-            'Feveiro': '02',
-            'Março': '03',
-            'Abril': '04',
-            'Maio': '05',
-            'Junho': '06',
-            'Julho': '07',
-            'Agosto': '08',
-            'Setembro': '09',
-            'Outubro': '10',
-            'Novembro': '11',
-            'Dezembro': '12'
+            'Janeiro': 1,
+            'Feveiro': 2,
+            'Março': 3,
+            'Abril': 4,
+            'Maio': 5,
+            'Junho': 6,
+            'Julho': 7,
+            'Agosto': 8,
+            'Setembro': 9,
+            'Outubro': 10,
+            'Novembro': 11,
+            'Dezembro': 12
         }
-        months_key = st.selectbox('Selecione o mês', months.keys())
+        current_month = datetime.now().month
+        months_key = st.selectbox('Selecione o mês', months.keys(), index=(current_month - 1))
         month = months[months_key]
     
-    pattern = '^\d{2}/' + f'{month}/{year}$'
-    docs = collection.find({'Data da próxima realização': {'$regex': pattern}}, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1})
-    year = f'[{int(year[-1]) - 1}-9]'
-    tests_done = pd.DataFrame()
-    for doc in docs:
-        pattern = '^\d{2}/\d{2}/202' + f'{year}$'
-        data_da_proxima_realizacao = doc.pop('Data da próxima realização')
-        data_de_realizacao = {'Data de realização': {'$regex': pattern}}
-        query = {**doc, **data_de_realizacao}
+    previous_year = year - 1
+    begin_period = datetime(previous_year, month, 1)
+    if month == 12:
+        end_period = datetime(year+1, 1, 1)
+    else:
+        end_period = datetime(year, month+1, 1)
+    query = {
+        "Data da próxima realização": {
+            "$gte": begin_period,
+            "$lt": end_period
+        }
+    }
+    # query = {
+    #     "$expr": {
+    #         "$and": [
+    #             {"$eq": [{"$year": "$Data da próxima realização"}, year]},
+    #             {"$eq": [{"$month": "$Data da próxima realização"}, month]}
+    #         ]
+    #     }
+    # }
+    tests_to_due = collection.find(query, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1}).sort('Data da próxima realização', pymongo.DESCENDING)
+
+    tests_to_do_current_month = pd.DataFrame()
+    tests_to_due_current_month = []
+    for test in tests_to_due:
+        tuple_test = (test['Equipamento'], test['Nome'])
+        if tuple_test not in tests_to_due_current_month:
+            test_check = tests_to_due_current_month.append(tuple_test)
+        else:
+            continue
+        data_da_proxima_realizacao = test.pop('Data da próxima realização')
+        query = {
+            "Data de realização": {
+                "$gte": begin_period,
+                "$lt": end_period
+            },
+            **test
+        }
         result = collection.find(query, {'_id': 0, 'Data da próxima realização': 0})
         test_done = pd.DataFrame(list(result))
-        try:
-            test_done['Data de realização'] = pd.to_datetime(test_done['Data de realização'], format='%d/%m/%Y')
+        
+        if not test_done.empty:
             test_done.sort_values(by='Data de realização', ascending=False, inplace=True)
             test_done['Data da próxima realização'] = data_da_proxima_realizacao
-            test_done['Data da próxima realização'] = pd.to_datetime(test_done['Data da próxima realização'], format='%d/%m/%Y')
-            test_done['Diferença data'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
-            test_done['how_to_due'] = (test_done['Data da próxima realização'] - datetime.now()).dt.days
-            test_done['how_long_done'] = (datetime.now() - test_done['Data de realização'])
-            # if list_tests_gc_periodicity[doc['Nome']] == 'Mensal':
-            #     if test_done['Diferença data'] > pd.Timedelta(month=1):
-            #         tests_done = pd.concat([tests_done, test_done.iloc[[0]]])
-            # elif list_tests_gc_periodicity[doc['Nome']] == 'Trimestral':
-            #     if test_done['Diferença data'] > pd.Timedelta(month=3):
-            #         tests_done = pd.concat([tests_done, test_done.iloc[[0]]])
-            # elif list_tests_gc_periodicity[doc['Nome']] == 'Semestral':
-            #     if test_done['Diferença data'] > pd.Timedelta(month=6):
-            #         tests_done = pd.concat([tests_done, test_done.iloc[[0]]])
-            # elif list_tests_gc_periodicity[doc['Nome']] == 'Anual':
-            #     if test_done['Diferença data'] > pd.Timedelta(year=1):
-            #         tests_done = pd.concat([tests_done, test_done.iloc[[0]]])
-            tests_done = pd.concat([tests_done, test_done.iloc[[0]]])
-        except:
+            test_done = test_done.iloc[[0]]
+            
+            if map_gc_periodicity(test['Nome']) == 'Mensal':
+                test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
+                test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=29)
+            elif map_gc_periodicity(test['Nome']) == 'Trimestral':
+                test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
+                test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=91)
+            elif map_gc_periodicity(test['Nome']) == 'Semestral':
+                test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
+                test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=182)
+            elif map_gc_periodicity(test['Nome']) == 'Anual':
+                test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
+                test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=366)            
+            
+            if test_done['is_expired'].values[0]:
+                test_done.drop(columns='is_expired', inplace=True)
+                tests_to_do_current_month = pd.concat([tests_to_do_current_month, test_done.iloc[[0]]])
+        else:
             continue
-    
-    st.dataframe(tests_done)
+    total_due = len(tests_to_do_current_month)
+    total_tests = len(tests_to_due_current_month)
+    meta = total_tests / (total_due + total_tests)
+    st.dataframe(tests_to_do_current_month, use_container_width=True)
+    st.write(f'Total de testes atrasados: {total_due}')
+    st.write(f'Total de testes para realizar: {total_tests}')
+    st.write(f'Meta de realização: {meta:.2%}')
     
 
 if 'teste_archivation' not in st.session_state:
@@ -155,10 +206,10 @@ with arquivamento:
     stylized_table = styler.stylized_testes()
     
     edited_df = st.data_editor(stylized_table, hide_index=True, use_container_width=True, on_change=change_archive_status, disabled=('Equipamento', 
-                                                                                                    'Nome', 
-                                                                                                    'Data de realização', 
-                                                                                                    'Data da próxima realização'))
-    
+                                                                                                                                    'Nome', 
+                                                                                                                                    'Data de realização', 
+                                                                                                                                    'Data da próxima realização'))
+                                    
     if st.session_state.teste_archivation:
         st.session_state.teste_archivation = False
         
@@ -173,7 +224,6 @@ with arquivamento:
         # Get the entire rows from the original dataframe
         diff_rows = testes.loc[diff_indices]
         query = diff_rows.drop(columns='Arquivado')
-        query['Data de realização'] = query['Data de realização'].dt.strftime('%d/%m/%Y')
         query = query.to_dict('records')
         
         # Get only the archivation status with differences
@@ -183,7 +233,7 @@ with arquivamento:
         update_status = teste_col.update_one(query[0], {'$set': archived_status})
         if update_status.matched_count > 0:
             st.success('Status de arquivamento atualizado com sucesso!')
-            time.sleep(1)
+            time.sleep(0.5)
             client.close()
             st.rerun()
         else:

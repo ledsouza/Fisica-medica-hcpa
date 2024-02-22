@@ -139,8 +139,8 @@ class FormMongoDB():
                     test['Data da próxima realização'] = self._next_test(test['Nome'], test['Data de realização'])
                     test['Arquivado'] = False
                     
-                    test['Data de realização'] = test['Data de realização'].strftime('%d/%m/%Y')
-                    test['Data da próxima realização'] = test['Data da próxima realização'].strftime('%d/%m/%Y')
+                    test['Data de realização'] = test['Data de realização']
+                    test['Data da próxima realização'] = test['Data da próxima realização']
                     
                     self.collection = self.db['testes']
                     if type_form == 'registration':
