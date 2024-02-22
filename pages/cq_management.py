@@ -133,6 +133,7 @@ with indicadores:
 
     tests_to_do_current_month = pd.DataFrame()
     tests_to_due_current_month = []
+    check_if_archived = []
     for test in tests_to_due:
         tuple_test = (test['Equipamento'], test['Nome'])
         if tuple_test not in tests_to_due_current_month:
@@ -171,6 +172,11 @@ with indicadores:
             if test_done['is_expired'].values[0]:
                 test_done.drop(columns='is_expired', inplace=True)
                 tests_to_do_current_month = pd.concat([tests_to_do_current_month, test_done.iloc[[0]]])
+            else:
+                check_if_archived.append({'Equipamento': test_done.iloc[[0]]['Equipamento'].values[0],
+                                         'Nome': test_done.iloc[[0]]['Nome'].values[0],
+                                         'Data de realização': test_done.iloc[[0]]['Data de realização'].values[0],
+                                         })
         else:
             continue
     tests_to_do_current_month.drop(columns='diff', inplace=True)
@@ -254,6 +260,9 @@ with arquivamento:
             st.rerun()
         else:
             st.error('Erro ao atualizar o status de arquivamento!')
+            
+    st.write(check_if_archived)
+    
     
 with registrar_teste:
     FormMongoDB(client).form_widget('registration')
