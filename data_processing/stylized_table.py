@@ -28,8 +28,7 @@ class StylizedCQ(StylizedTable):
         
         self.table = self.table.style.apply(highlight_expired_dates, axis=1)
         self.table = self.table.format({
-            'Data de realização': '{:%d/%m/%Y}',
-            'Data da próxima realização': '{:%d/%m/%Y}'
+            'Data de realização': '{:%d/%m/%Y}'
         })
         
         return self.table

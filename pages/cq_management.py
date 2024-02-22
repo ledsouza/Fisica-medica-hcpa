@@ -201,7 +201,7 @@ def change_archive_status():
 
 with arquivamento:    
     teste_col = db['testes']
-    testes = pd.DataFrame(list(teste_col.find({}, {'_id': 0})))
+    testes = pd.DataFrame(list(teste_col.find({}, {'_id': 0, 'Data da próxima realização': 0})))
     styler = StylizedCQ(testes)
     stylized_table = styler.stylized_testes()
     

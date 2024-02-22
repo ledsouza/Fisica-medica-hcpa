@@ -133,7 +133,7 @@ class FormMongoDB():
                     
                 test['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
                 
-                submit_label = 'Remover teste' if type_form == 'removal' else 'Inserir Teste'
+                submit_label = 'Remover teste' if type_form == 'removal' else 'Inserir teste'
                 submit_button = st.form_submit_button(label=submit_label)
                 if submit_button:
                     test['Data da próxima realização'] = self._next_test(test['Nome'], test['Data de realização'])
