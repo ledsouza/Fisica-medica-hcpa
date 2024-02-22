@@ -186,8 +186,8 @@ with indicadores:
     total_tests = len(tests_to_due_current_month)
     meta = total_tests / (total_due + total_tests)
     st.dataframe(tests_to_do_current_month, use_container_width=True)
-    st.write(f'Total de testes atrasados: {total_due}')
-    st.write(f'Total de testes para realizar: {total_tests}')
+
+    st.write(f'Total de testes para realizar: {total_due}')
     st.write(f'Meta de realização: {meta:.2%}')
     
 
