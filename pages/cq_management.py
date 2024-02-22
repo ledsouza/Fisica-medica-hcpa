@@ -10,9 +10,7 @@ import time
 from data_processing.stylized_table import StylizedCQ
 from forms import FormMongoDB
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 from tests_periodicity import map_gc_periodicity
-import numpy as np
 
 list_tests_gc_periodicity = {
     'Uniformidade intrínseca para alta densidade de contagem': 'Mensal',
@@ -233,7 +231,7 @@ with arquivamento:
         update_status = teste_col.update_one(query[0], {'$set': archived_status})
         if update_status.matched_count > 0:
             st.success('Status de arquivamento atualizado com sucesso!')
-            time.sleep(0.5)
+            time.sleep(1)
             client.close()
             st.rerun()
         else:

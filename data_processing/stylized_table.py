@@ -1,7 +1,5 @@
 import pandas as pd
 from datetime import datetime, timedelta
-import streamlit as st
-
 class StylizedTable:
     def __init__(self, table: pd.DataFrame) -> None:
         self.table = table
