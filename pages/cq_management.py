@@ -70,11 +70,10 @@ except Exception as e:
     
 db = client['cq_gestao']
     
-indicadores, panorama_ano, arquivamento, registrar_teste, remover_teste = st.tabs(['Indicadores',
-                                                                                   'Panorama do ano',
-                                                                                   'Arquivamento',
-                                                                                   'Registrar teste',
-                                                                                   'Remover teste'])
+indicadores, arquivamento, registrar_teste, remover_teste = st.tabs(['Indicadores',
+                                                                    'Arquivamento',
+                                                                    'Registrar teste',
+                                                                    'Remover teste'])
 
 with indicadores:
     collection = db['testes']
@@ -197,7 +196,8 @@ with indicadores:
                                                                 'Data de realização esperada'
                                                                 ))
 
-    total_due = len(edited_tests_to_do_current_month[edited_tests_to_do_current_month['Sem material'] == False])
+    mask = (edited_tests_to_do_current_month['Sem material'] == False)
+    total_due = len(edited_tests_to_do_current_month[mask])
     total_tests = len(tests_to_due_current_month)
         
     meta = total_tests / (total_due + total_tests) * 100
@@ -206,7 +206,7 @@ with indicadores:
     with col1:
         st.metric(label='Total de testes para realizar', value=f'{total_due}')
     with col2:
-        st.metric(label='Indicador do Controle de Qualidade', value=f'{meta:.2f}%')
+        st.metric(label='Indicador de Realização', value=f'{meta:.2f}%')
     
 
 if 'teste_archivation' not in st.session_state:
