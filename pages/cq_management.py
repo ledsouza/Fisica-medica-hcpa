@@ -182,6 +182,8 @@ with indicadores:
                 tests_to_do_current_month = pd.concat([tests_to_do_current_month, test_done.iloc[[0]]])
         else:
             continue
+    tests_to_do_current_month.drop(columns='diff', inplace=True)
+    
     total_due = len(tests_to_do_current_month)
     total_tests = len(tests_to_due_current_month)
     meta = total_tests / (total_due + total_tests)
