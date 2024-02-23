@@ -50,7 +50,7 @@ class TestsPeriodicity():
     def _set_pet_tests(self):
         list_tests_pet_periodicity = {
             'Uniformidade e verificação da calibração do sistema PET-CT': 'Mensal',
-            'Normalização e Calibração cruzada': 'Trimestral',
+            'Normalização e calibração cruzada': 'Trimestral',
             'Resolução espacial': 'Semestral',
             'Sensibilidade': 'Semestral',
             'Corregistro das imagens de PET e CT': 'Semestral',

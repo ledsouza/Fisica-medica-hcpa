@@ -207,7 +207,19 @@ with arquivamento:
                                                                                                                                     'Nome', 
                                                                                                                                     'Data de realização', 
                                                                                                                                     'Data da próxima realização'))
-                                    
+    st.markdown("""
+                <span style='font-size: smaller;'>**Observação:** Foi definido o período de um mês para realização do relatório.</span>
+                """
+                , unsafe_allow_html=True)
+    
+    with st.container(border=True):
+        st.markdown("""
+                    **Legenda:** <br>
+                    <span style='color: #FFA07A;'>Relatório atrasado</span> <br>
+                    <span style='color: #FFD700;'>Dentro do período de desenvolvimento do relatório</span> <br>
+                    <span style='color: #90EE90;'>Relatório realizado</span>
+                    """, unsafe_allow_html=True)
+                               
     if st.session_state.teste_archivation:
         st.session_state.teste_archivation = False
         
