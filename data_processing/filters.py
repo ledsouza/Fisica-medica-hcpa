@@ -1,5 +1,33 @@
+import pandas as pd
 import numpy as np
 import streamlit as st
+
+def filters_archivation(dataframe: pd.DataFrame):
+    
+    
+    equipamento = st.multiselect('Selecione o equipamento', dataframe['Equipamento'].unique(), default=dataframe['Equipamento'].unique())
+    with st.expander('Selecione o nome do teste'):
+        nome = st.multiselect('', dataframe['Nome'].unique(), default=dataframe['Nome'].unique())
+    periodo = st.date_input(
+            label="Selecione o Período",
+            min_value=dataframe["Data de realização"].min(),
+            max_value=dataframe["Data de realização"].max(),
+            value=(dataframe["Data de realização"].min(), dataframe["Data de realização"].max()),
+    )
+    try:
+        start_date, end_date = periodo
+    except:
+        st.error("É necessário selecionar um período válido")
+        st.stop()
+    
+    query = """
+            Equipamento in @equipamento and \
+            @periodo[0] <= `Data de realização` <= @periodo[1] and \
+            Nome in @nome
+    """
+    
+    filtered_df = dataframe.query(query)
+    return filtered_df
 
 def filters_bi(dataframe):
     dataframe['Atividade Administrada'] = dataframe['Atividade Administrada'].fillna(0.0)

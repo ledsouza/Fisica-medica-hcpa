@@ -8,6 +8,7 @@ import pymongo
 import pandas as pd
 import time
 from data_processing.stylized_table import StylizedCQ
+from data_processing.filters import filters_archivation
 from forms import FormMongoDB
 from datetime import datetime
 from tests_periodicity import map_gc_periodicity
@@ -218,9 +219,9 @@ with indicadores:
     with col1:
         st.metric(label='Total de testes para realizar', value=f'{total_due}')
     with col2:
-        st.metric(label='Indicador de Realização', value=f'{indicador_realizacao:.2f}%')
+        st.metric(label='Indicador de Realização', value=f'{indicador_realizacao:.2f}%'.replace('.', ','))
     with col3:
-        st.metric(label='Indicador de Arquivamento', value=f'{indicador_arquivamento:.2f}%')
+        st.metric(label='Indicador de Arquivamento', value=f'{indicador_arquivamento:.2f}%'.replace('.', ','))
     
 
 if 'teste_archivation' not in st.session_state:
@@ -232,7 +233,10 @@ def change_archive_status():
 with arquivamento:    
     teste_col = db['testes']
     testes = pd.DataFrame(list(teste_col.find({}, {'_id': 0, 'Data da próxima realização': 0})))
-    styler = StylizedCQ(testes)
+    
+    filtered_tests = filters_archivation(testes)
+    
+    styler = StylizedCQ(filtered_tests)
     stylized_table = styler.stylized_testes()
     
     edited_df = st.data_editor(stylized_table, hide_index=True, use_container_width=True, on_change=change_archive_status, disabled=('Equipamento', 
