@@ -9,86 +9,6 @@ class FormMongoDB():
         self.db = client['cq_gestao']
         self.collection = None
         self.tests_periodicity = TestsPeriodicity()
-    #     self.list_tests_gc_periodicity = self._set_gc_tests()
-    #     self.list_tests_pet_periodicity = self._set_pet_tests()
-    #     self.list_tests_curiometro_periodicity = self._set_curiometro_tests()
-    #     self.list_tests_gm_periodicity = self._set_gm_tests()
-    #     self.list_tests_gp_periodicity = self._set_gp_tests()
-        
-    # def _set_gc_tests(self):
-    #     list_tests_gc_periodicity = {
-    #         'Uniformidade intrínseca para alta densidade de contagem': 'Mensal',
-    #         'Resolução e linearidade espacial intrínseca': 'Mensal',
-    #         'Centro de rotação LEHR': 'Mensal',
-    #         'Centro de rotação MEGP': 'Mensal',
-    #         'Centro de rotação HEGP': 'Mensal',
-    #         'Resolução energética Tc-99m': 'Semestral',
-    #         'Resolução energética Tl-201': 'Semestral',
-    #         'Resolução energética Ga-67': 'Semestral',
-    #         'Resolução energética I-131': 'Semestral',
-    #         'Taxa máxima de contagem': 'Semestral',
-    #         'Resolução espacial íntriseca para fontes multi-energética I-131': 'Semestral',
-    #         'Resolução espacial íntriseca para fontes multi-energética Ga-67': 'Semestral',
-    #         'Resolução espacial íntriseca para fontes multi-energética Tl-201': 'Semestral',
-    #         'Corregistro espacial para fontes multi-energéticas Ga-67': 'Semestral',
-    #         'Corregistro espacial para fontes multi-energéticas Tl-201': 'Semestral',
-    #         'Sensibilidade planar Tc-99m': 'Semestral',
-    #         'Sensibilidade planar Ga-67': 'Semestral',
-    #         'Sensibilidade planar I-131': 'Semestral',
-    #         'Sensibilidade planar Tl-201': 'Semestral',
-    #         'Uniformidade extrínseca para alta densidade de contagem LEHR': 'Semestral',
-    #         'Uniformidade extrínseca para alta densidade de contagem MEGP': 'Semestral',
-    #         'Uniformidade extrínseca para alta densidade de contagem HEGP': 'Semestral',
-    #         'Verificação da angulação dos furos LEHR': 'Semestral',
-    #         'Verificação da angulação dos furos MEGP': 'Semestral',
-    #         'Verificação da angulação dos furos HEGP': 'Semestral',
-    #         'Velocidade da mesa em varreduras de corpo inteiro': 'Semestral',
-    #         'Desempenho geral da câmara SPECT': 'Semestral',
-    #         'Uniformidade íntrinseca para I-131': 'Anual',
-    #         'Uniformidade íntrinseca para Ga-67': 'Anual',
-    #         'Uniformidade íntrinseca para Tl-201': 'Anual',
-    #         'Uniformidade intrínseca com janelas energéticas assimétricas': 'Anual',
-    #         'Resolução e linearidade espacial extrínseca LEHR': 'Anual',
-    #         'Resolução e linearidade espacial extrínseca MEGP': 'Anual',
-    #         'Resolução e linearidade espacial extrínseca HEGP': 'Anual'
-    #     }
-    #     return list_tests_gc_periodicity
-    
-    # def _set_pet_tests(self):
-    #     list_tests_pet_periodicity = {
-    #         'Uniformidade e verificação da calibração do sistema PET-CT': 'Mensal',
-    #         'Normalização e Calibração cruzada': 'Trimestral',
-    #         'Resolução espacial': 'Semestral',
-    #         'Sensibilidade': 'Semestral',
-    #         'Corregistro das imagens de PET e CT': 'Semestral',
-    #         '''Desempenho da taxa de contagens (NECR), 
-    #         taxa de eventos aleatórios, espalhados e verdadeiros, 
-    #         fração de espalhamento e 
-    #         exatidão das correções de eventos aleatórios e de perda de contagens''': 'Anual',
-    #         'Desempenho geral e exatidão das correções de atenuação e espalhamento': 'Anual',
-    #     }
-    #     return list_tests_pet_periodicity
-    
-    # def _set_curiometro_tests(self):
-    #     list_tests_curiometro_periodicity = {
-    #         'Reprodutibilidade': 'Mensal',
-    #         'Precisão e exatidão': 'Semestral',
-    #         'Linearidade': 'Semestral',
-    #         'Geometria': 'Anual'
-    #     }
-    #     return list_tests_curiometro_periodicity
-    
-    # def _set_gm_tests(self):
-    #     list_tests_gm_periodicity = {
-    #         'Reprodutibilidade': 'Mensal'
-    #     }
-    #     return list_tests_gm_periodicity
-    
-    # def _set_gp_tests(self):
-    #     list_tests_gp_periodicity = {
-    #         'Repetibilidade': 'Semestral'
-    #     }
-    #     return list_tests_gp_periodicity
     
     def _next_test(self, name, date):
         list_tests_periodicity = self.tests_periodicity.full_list()
@@ -146,21 +66,27 @@ class FormMongoDB():
                     
                     self.collection = self.db['testes']
                     if type_form == 'registration':
-                        insert_status = self.collection.insert_one(test)
-                        if insert_status.acknowledged:
-                            st.success('Teste inserido com sucesso!')
-                            time.sleep(1)
-                            self.client.close()
-                            st.rerun()
+                        if self.collection.find_one(test) is not None:
+                            st.error('Teste já inserido!')
+                        else:
+                            insert_status = self.collection.insert_one(test)
+                            if insert_status.acknowledged:
+                                st.success('Teste inserido com sucesso!')
+                                time.sleep(1)
+                                self.client.close()
+                                st.rerun()
                     elif type_form == 'removal':
                         removal_status = self.collection.delete_one(test)
-                        if removal_status.deleted_count > 0:
-                            st.success('Teste removido com sucesso!')
-                            time.sleep(1)
-                            self.client.close()
-                            st.rerun()
+                        if self.collection.find_one(test) is None:
+                            st.error('Teste não encontrado!')
                         else:
-                            st.error('Erro ao remover o teste!')
+                            if removal_status.deleted_count > 0:
+                                st.success('Teste removido com sucesso!')
+                                time.sleep(1)
+                                self.client.close()
+                                st.rerun()
+                            else:
+                                st.error('Erro ao remover o teste!')
                     else:
                         raise ValueError('Invalid type_form')
                     
