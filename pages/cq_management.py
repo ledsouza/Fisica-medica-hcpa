@@ -168,6 +168,7 @@ with indicadores:
     
     
     tests_to_do_current_month.rename(columns={'Data de realização': 'Data da última realização', 'Data da próxima realização': 'Data de realização esperada'}, inplace=True)
+    tests_to_do_current_month.sort_values(by=['Sem material','Data de realização esperada'], inplace=True)
     s_tests_to_do_current_month = tests_to_do_current_month.drop(columns='Arquivado').style
     s_tests_to_do_current_month.format(
         {
