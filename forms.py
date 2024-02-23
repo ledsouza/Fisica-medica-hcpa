@@ -68,6 +68,7 @@ class FormMongoDB():
                     if type_form == 'registration':
                         if self.collection.find_one(test) is not None:
                             st.error('Teste já inserido!')
+                            self.client.close()
                         else:
                             insert_status = self.collection.insert_one(test)
                             if insert_status.acknowledged:
@@ -77,16 +78,13 @@ class FormMongoDB():
                                 st.rerun()
                     elif type_form == 'removal':
                         removal_status = self.collection.delete_one(test)
-                        if self.collection.find_one(test) is None:
-                            st.error('Teste não encontrado!')
+                        if removal_status.deleted_count > 0:
+                            st.success('Teste removido com sucesso!')
+                            time.sleep(1)
+                            self.client.close()
+                            st.rerun()
                         else:
-                            if removal_status.deleted_count > 0:
-                                st.success('Teste removido com sucesso!')
-                                time.sleep(1)
-                                self.client.close()
-                                st.rerun()
-                            else:
-                                st.error('Erro ao remover o teste!')
+                            st.error('Erro ao remover o teste!')
                     else:
                         raise ValueError('Invalid type_form')
                     
