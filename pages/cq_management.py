@@ -143,9 +143,30 @@ with indicadores:
             continue
     tests_to_do_current_month.drop(columns='diff', inplace=True)
     
-    
-    
     tests_to_do_current_month['Sem material'] = False
+    with st.sidebar:
+        st.markdown('Materiais ausentes para realização dos testes:')
+        materials = {}
+        materials['Ga-67'] = st.toggle('Ga-67', value=True)
+        materials['Tl-201'] = st.toggle('Tl-201', value=True)
+        materials['I-131'] = st.toggle('I-131', value=False)
+    
+    if materials['Ga-67'] and materials['Tl-201'] and materials['I-131']:
+        tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x or 'I-131' in x else False)
+    if materials['Ga-67'] and materials['Tl-201'] and not materials['I-131']:
+        tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x else False)
+    if materials['Ga-67'] and not materials['Tl-201'] and materials['I-131']:
+        tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x or 'I-131' in x else False)
+    if not materials['Ga-67'] and materials['Tl-201'] and materials['I-131']:
+        tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Tl-201' in x or 'I-131' in x else False)
+    if materials['Ga-67'] and not materials['Tl-201'] and not materials['I-131']:
+        tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x else False)
+    if not materials['Ga-67'] and materials['Tl-201'] and not materials['I-131']:
+        tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Tl-201' in x else False)
+    if not materials['Ga-67'] and not materials['Tl-201'] and materials['I-131']:
+        tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'I-131' in x else False)
+    
+    
     tests_to_do_current_month.rename(columns={'Data de realização': 'Data da última realização', 'Data da próxima realização': 'Data de realização esperada'}, inplace=True)
     s_tests_to_do_current_month = tests_to_do_current_month.drop(columns='Arquivado').style
     s_tests_to_do_current_month.format(
@@ -155,19 +176,13 @@ with indicadores:
         }
     )
     
-    edited_tests_to_do_current_month = st.data_editor(s_tests_to_do_current_month, 
-                                                      hide_index=True,  
-                                                      disabled=('Equipamento',
-                                                                'Nome',
-                                                                'Data da última realização',
-                                                                'Data de realização esperada'
-                                                                ))
+    st.dataframe(s_tests_to_do_current_month, hide_index=True, use_container_width=True)
 
-    mask = (edited_tests_to_do_current_month['Sem material'] == True) 
-    total_done = len(tests_done_current_month) + len(edited_tests_to_do_current_month[mask])
+    mask = (tests_to_do_current_month['Sem material'] == True) 
+    total_done = len(tests_done_current_month) + len(tests_to_do_current_month[mask])
     
-    mask = (edited_tests_to_do_current_month['Sem material'] == False) 
-    total_due = len(edited_tests_to_do_current_month[mask])
+    mask = (tests_to_do_current_month['Sem material'] == False) 
+    total_due = len(tests_to_do_current_month[mask])
     
     total_tests = len(tests_to_due_current_month)
         
