@@ -7,7 +7,7 @@ def filters_archivation(dataframe: pd.DataFrame):
     
     equipamento = st.multiselect('Selecione o equipamento', dataframe['Equipamento'].unique(), default=dataframe['Equipamento'].unique())
     with st.expander('Selecione o nome do teste'):
-        nome = st.multiselect('', dataframe['Nome'].unique(), default=dataframe['Nome'].unique())
+        nome = st.multiselect('Selecione o nome do teste', dataframe['Nome'].unique(), default=dataframe['Nome'].unique(), label_visibility='hidden')
     periodo = st.date_input(
             label="Selecione o Período",
             min_value=dataframe["Data de realização"].min(),
