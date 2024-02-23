@@ -63,7 +63,8 @@ class TestsPeriodicity():
         list_tests_curiometro_periodicity = {
             'Reprodutibilidade': 'Mensal',
             'Precisão e exatidão': 'Semestral',
-            'Linearidade': 'Semestral',
+            'Linearidade F-18': 'Semestral',
+            'Linearidade Tc-99m': 'Semestral',
             'Geometria': 'Anual'
         }
         return list_tests_curiometro_periodicity
