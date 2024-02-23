@@ -133,7 +133,7 @@ with indicadores:
 
     tests_to_do_current_month = pd.DataFrame()
     tests_to_due_current_month = []
-    check_if_archived = []
+    tests_done_current_month = []
     for test in tests_to_due:
         tuple_test = (test['Equipamento'], test['Nome'])
         if tuple_test not in tests_to_due_current_month:
@@ -173,7 +173,7 @@ with indicadores:
                 test_done.drop(columns='is_expired', inplace=True)
                 tests_to_do_current_month = pd.concat([tests_to_do_current_month, test_done.iloc[[0]]])
             else:
-                check_if_archived.append({'Equipamento': test_done.iloc[[0]]['Equipamento'].values[0],
+                tests_done_current_month.append({'Equipamento': test_done.iloc[[0]]['Equipamento'].values[0],
                                          'Nome': test_done.iloc[[0]]['Nome'].values[0],
                                          'Data de realização': test_done.iloc[[0]]['Data de realização'].values[0],
                                          })
@@ -202,17 +202,19 @@ with indicadores:
                                                                 'Data de realização esperada'
                                                                 ))
 
-    mask = (edited_tests_to_do_current_month['Sem material'] == False)
+    mask = (edited_tests_to_do_current_month['Sem material'] == True) 
+    total_done = len(tests_done_current_month) + len(edited_tests_to_do_current_month[mask])
+    mask = (edited_tests_to_do_current_month['Sem material'] == False) 
     total_due = len(edited_tests_to_do_current_month[mask])
     total_tests = len(tests_to_due_current_month)
         
-    meta = total_tests / (total_due + total_tests) * 100
+    indicador_realizacao = total_done / (total_tests) * 100
     
     col1, col2 = st.columns(2)
     with col1:
         st.metric(label='Total de testes para realizar', value=f'{total_due}')
     with col2:
-        st.metric(label='Indicador de Realização', value=f'{meta:.2f}%')
+        st.metric(label='Indicador de Realização', value=f'{indicador_realizacao:.2f}%')
     
 
 if 'teste_archivation' not in st.session_state:
@@ -261,7 +263,6 @@ with arquivamento:
         else:
             st.error('Erro ao atualizar o status de arquivamento!')
             
-    st.write(check_if_archived)
     
     
 with registrar_teste:
