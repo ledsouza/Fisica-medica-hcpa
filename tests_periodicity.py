@@ -54,10 +54,7 @@ class TestsPeriodicity():
             'Resolução espacial': 'Semestral',
             'Sensibilidade': 'Semestral',
             'Corregistro das imagens de PET e CT': 'Semestral',
-            '''Desempenho da taxa de contagens (NECR), 
-            taxa de eventos aleatórios, espalhados e verdadeiros, 
-            fração de espalhamento e 
-            exatidão das correções de eventos aleatórios e de perda de contagens''': 'Anual',
+            'Desempenho da taxa de contagens (NECR), taxa de eventos aleatórios, espalhados e verdadeiros, fração de espalhamento e exatidão das correções de eventos aleatórios e de perda de contagens': 'Anual',
             'Desempenho geral e exatidão das correções de atenuação e espalhamento': 'Anual',
         }
         return list_tests_pet_periodicity
