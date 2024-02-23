@@ -117,7 +117,7 @@ with indicadores:
         months_key = st.selectbox('Selecione o mês', months.keys(), index=(current_month - 1))
         month = months[months_key]
     
-    previous_year = year - 1
+    previous_year = year - 2
     begin_period = datetime(previous_year, month, 1)
     if month == 12:
         end_period = datetime(year+1, 1, 1)
