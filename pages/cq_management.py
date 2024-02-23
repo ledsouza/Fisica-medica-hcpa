@@ -65,7 +65,7 @@ with indicadores:
     with col2:
         months = {
             'Janeiro': 1,
-            'Feveiro': 2,
+            'Fevereiro': 2,
             'Março': 3,
             'Abril': 4,
             'Maio': 5,
@@ -208,7 +208,8 @@ with arquivamento:
                                                                                                                                     'Data de realização', 
                                                                                                                                     'Data da próxima realização'))
     st.markdown("""
-                <span style='font-size: smaller;'>**Observação:** Foi definido o período de um mês para realização do relatório.</span>
+                <span style='font-size: smaller;'>**Observação:** Foi definido o período de um mês para realização do relatório. <br>
+                O status de arquivamento é atualizado ao clicar na caixa de seleção. Arquive um teste por vez.</span>
                 """
                 , unsafe_allow_html=True)
     
