@@ -119,18 +119,18 @@ with indicadores:
             test_done.sort_values(by='Data de realização', ascending=False, inplace=True)
             test_done['Data da próxima realização'] = data_da_proxima_realizacao
             test_done = test_done.iloc[[0]]
-            tests_periodicity = TestsPeriodicity()
+            tests_periodicity = TestsPeriodicity().full_list()
             
-            if tests_periodicity.map_gc_periodicity(test['Nome']) == 'Mensal':
+            if tests_periodicity[test['Nome']] == 'Mensal':
                 test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=29)
-            elif tests_periodicity.map_gc_periodicity(test['Nome']) == 'Trimestral':
+            elif tests_periodicity[test['Nome']] == 'Trimestral':
                 test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=91)
-            elif tests_periodicity.map_gc_periodicity(test['Nome']) == 'Semestral':
+            elif tests_periodicity[test['Nome']] == 'Semestral':
                 test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=182)
-            elif tests_periodicity.map_gc_periodicity(test['Nome']) == 'Anual':
+            elif tests_periodicity[test['Nome']] == 'Anual':
                 test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=366)            
             
