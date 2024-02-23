@@ -71,6 +71,7 @@ class FormMongoDB():
                         check_test = test['Equipamento']
                         check_test = test['Nome']
                         check_test = test['Data de realização']
+                        st.write(check_test)
                         if self.collection.find_one(check_test) is not None:
                             st.error('Teste já inserido!')
                             self.client.close()
