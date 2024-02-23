@@ -211,7 +211,7 @@ with arquivamento:
     if st.session_state.teste_archivation:
         st.session_state.teste_archivation = False
         
-        diff = testes.compare(edited_df)
+        diff = filtered_tests.compare(edited_df)
         
         # Drop the multi-index to make filtering easier
         diff.columns = diff.columns.droplevel(0)
@@ -220,7 +220,7 @@ with arquivamento:
         diff_indices = diff[diff['self'].notna() | diff['other'].notna()].index
         
         # Get the entire rows from the original dataframe
-        diff_rows = testes.loc[diff_indices]
+        diff_rows = filtered_tests.loc[diff_indices]
         query = diff_rows.drop(columns='Arquivado')
         query = query.to_dict('records')
         
