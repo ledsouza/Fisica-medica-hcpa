@@ -171,12 +171,9 @@ with indicadores:
             
             if test_done['is_expired'].values[0]:
                 test_done.drop(columns='is_expired', inplace=True)
-                tests_to_do_current_month = pd.concat([tests_to_do_current_month, test_done.iloc[[0]]])
+                tests_to_do_current_month = pd.concat([tests_to_do_current_month, test_done])
             else:
-                tests_done_current_month.append({'Equipamento': test_done.iloc[[0]]['Equipamento'].values[0],
-                                         'Nome': test_done.iloc[[0]]['Nome'].values[0],
-                                         'Data de realização': test_done.iloc[[0]]['Data de realização'].values[0],
-                                         })
+                tests_done_current_month.append(test_done.to_dict('records')[0])
         else:
             continue
     tests_to_do_current_month.drop(columns='diff', inplace=True)
@@ -194,7 +191,6 @@ with indicadores:
     )
     
     edited_tests_to_do_current_month = st.data_editor(s_tests_to_do_current_month, 
-                                                      use_container_width=True, 
                                                       hide_index=True,  
                                                       disabled=('Equipamento',
                                                                 'Nome',
@@ -204,17 +200,27 @@ with indicadores:
 
     mask = (edited_tests_to_do_current_month['Sem material'] == True) 
     total_done = len(tests_done_current_month) + len(edited_tests_to_do_current_month[mask])
+    
     mask = (edited_tests_to_do_current_month['Sem material'] == False) 
     total_due = len(edited_tests_to_do_current_month[mask])
+    
     total_tests = len(tests_to_due_current_month)
         
     indicador_realizacao = total_done / (total_tests) * 100
     
-    col1, col2 = st.columns(2)
+    total_archived = total_done
+    for test in tests_done_current_month:
+        if not test['Arquivado']:
+            total_archived -= 1
+    indicador_arquivamento = total_archived / total_tests * 100
+    
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.metric(label='Total de testes para realizar', value=f'{total_due}')
     with col2:
         st.metric(label='Indicador de Realização', value=f'{indicador_realizacao:.2f}%')
+    with col3:
+        st.metric(label='Indicador de Arquivamento', value=f'{indicador_arquivamento:.2f}%')
     
 
 if 'teste_archivation' not in st.session_state:
