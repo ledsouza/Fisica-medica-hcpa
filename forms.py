@@ -1,95 +1,97 @@
 import streamlit as st
 import pandas as pd
 import time
+from tests_periodicity import TestsPeriodicity
         
 class FormMongoDB():
     def __init__(self, client) -> None:
         self.client = client
         self.db = client['cq_gestao']
         self.collection = None
-        self.list_tests_gc_periodicity = self._set_gc_tests()
-        self.list_tests_pet_periodicity = self._set_pet_tests()
-        self.list_tests_curiometro_periodicity = self._set_curiometro_tests()
-        self.list_tests_gm_periodicity = self._set_gm_tests()
-        self.list_tests_gp_periodicity = self._set_gp_tests()
+        self.tests_periodicity = TestsPeriodicity()
+    #     self.list_tests_gc_periodicity = self._set_gc_tests()
+    #     self.list_tests_pet_periodicity = self._set_pet_tests()
+    #     self.list_tests_curiometro_periodicity = self._set_curiometro_tests()
+    #     self.list_tests_gm_periodicity = self._set_gm_tests()
+    #     self.list_tests_gp_periodicity = self._set_gp_tests()
         
-    def _set_gc_tests(self):
-        list_tests_gc_periodicity = {
-            'Uniformidade intrínseca para alta densidade de contagem': 'Mensal',
-            'Resolução e linearidade espacial intrínseca': 'Mensal',
-            'Centro de rotação LEHR': 'Mensal',
-            'Centro de rotação MEGP': 'Mensal',
-            'Centro de rotação HEGP': 'Mensal',
-            'Resolução energética Tc-99m': 'Semestral',
-            'Resolução energética Tl-201': 'Semestral',
-            'Resolução energética Ga-67': 'Semestral',
-            'Resolução energética I-131': 'Semestral',
-            'Taxa máxima de contagem': 'Semestral',
-            'Resolução espacial íntriseca para fontes multi-energética I-131': 'Semestral',
-            'Resolução espacial íntriseca para fontes multi-energética Ga-67': 'Semestral',
-            'Resolução espacial íntriseca para fontes multi-energética Tl-201': 'Semestral',
-            'Corregistro espacial para fontes multi-energéticas Ga-67': 'Semestral',
-            'Corregistro espacial para fontes multi-energéticas Tl-201': 'Semestral',
-            'Sensibilidade planar Tc-99m': 'Semestral',
-            'Sensibilidade planar Ga-67': 'Semestral',
-            'Sensibilidade planar I-131': 'Semestral',
-            'Sensibilidade planar Tl-201': 'Semestral',
-            'Uniformidade extrínseca para alta densidade de contagem LEHR': 'Semestral',
-            'Uniformidade extrínseca para alta densidade de contagem MEGP': 'Semestral',
-            'Uniformidade extrínseca para alta densidade de contagem HEGP': 'Semestral',
-            'Verificação da angulação dos furos LEHR': 'Semestral',
-            'Verificação da angulação dos furos MEGP': 'Semestral',
-            'Verificação da angulação dos furos HEGP': 'Semestral',
-            'Velocidade da mesa em varreduras de corpo inteiro': 'Semestral',
-            'Desempenho geral da câmara SPECT': 'Semestral',
-            'Uniformidade íntrinseca para I-131': 'Anual',
-            'Uniformidade íntrinseca para Ga-67': 'Anual',
-            'Uniformidade íntrinseca para Tl-201': 'Anual',
-            'Uniformidade intrínseca com janelas energéticas assimétricas': 'Anual',
-            'Resolução e linearidade espacial extrínseca LEHR': 'Anual',
-            'Resolução e linearidade espacial extrínseca MEGP': 'Anual',
-            'Resolução e linearidade espacial extrínseca HEGP': 'Anual'
-        }
-        return list_tests_gc_periodicity
+    # def _set_gc_tests(self):
+    #     list_tests_gc_periodicity = {
+    #         'Uniformidade intrínseca para alta densidade de contagem': 'Mensal',
+    #         'Resolução e linearidade espacial intrínseca': 'Mensal',
+    #         'Centro de rotação LEHR': 'Mensal',
+    #         'Centro de rotação MEGP': 'Mensal',
+    #         'Centro de rotação HEGP': 'Mensal',
+    #         'Resolução energética Tc-99m': 'Semestral',
+    #         'Resolução energética Tl-201': 'Semestral',
+    #         'Resolução energética Ga-67': 'Semestral',
+    #         'Resolução energética I-131': 'Semestral',
+    #         'Taxa máxima de contagem': 'Semestral',
+    #         'Resolução espacial íntriseca para fontes multi-energética I-131': 'Semestral',
+    #         'Resolução espacial íntriseca para fontes multi-energética Ga-67': 'Semestral',
+    #         'Resolução espacial íntriseca para fontes multi-energética Tl-201': 'Semestral',
+    #         'Corregistro espacial para fontes multi-energéticas Ga-67': 'Semestral',
+    #         'Corregistro espacial para fontes multi-energéticas Tl-201': 'Semestral',
+    #         'Sensibilidade planar Tc-99m': 'Semestral',
+    #         'Sensibilidade planar Ga-67': 'Semestral',
+    #         'Sensibilidade planar I-131': 'Semestral',
+    #         'Sensibilidade planar Tl-201': 'Semestral',
+    #         'Uniformidade extrínseca para alta densidade de contagem LEHR': 'Semestral',
+    #         'Uniformidade extrínseca para alta densidade de contagem MEGP': 'Semestral',
+    #         'Uniformidade extrínseca para alta densidade de contagem HEGP': 'Semestral',
+    #         'Verificação da angulação dos furos LEHR': 'Semestral',
+    #         'Verificação da angulação dos furos MEGP': 'Semestral',
+    #         'Verificação da angulação dos furos HEGP': 'Semestral',
+    #         'Velocidade da mesa em varreduras de corpo inteiro': 'Semestral',
+    #         'Desempenho geral da câmara SPECT': 'Semestral',
+    #         'Uniformidade íntrinseca para I-131': 'Anual',
+    #         'Uniformidade íntrinseca para Ga-67': 'Anual',
+    #         'Uniformidade íntrinseca para Tl-201': 'Anual',
+    #         'Uniformidade intrínseca com janelas energéticas assimétricas': 'Anual',
+    #         'Resolução e linearidade espacial extrínseca LEHR': 'Anual',
+    #         'Resolução e linearidade espacial extrínseca MEGP': 'Anual',
+    #         'Resolução e linearidade espacial extrínseca HEGP': 'Anual'
+    #     }
+    #     return list_tests_gc_periodicity
     
-    def _set_pet_tests(self):
-        list_tests_pet_periodicity = {
-            'Uniformidade e verificação da calibração do sistema PET-CT': 'Mensal',
-            'Normalização e Calibração cruzada': 'Trimestral',
-            'Resolução espacial': 'Semestral',
-            'Sensibilidade': 'Semestral',
-            'Corregistro das imagens de PET e CT': 'Semestral',
-            '''Desempenho da taxa de contagens (NECR), 
-            taxa de eventos aleatórios, espalhados e verdadeiros, 
-            fração de espalhamento e 
-            exatidão das correções de eventos aleatórios e de perda de contagens''': 'Anual',
-            'Desempenho geral e exatidão das correções de atenuação e espalhamento': 'Anual',
-        }
-        return list_tests_pet_periodicity
+    # def _set_pet_tests(self):
+    #     list_tests_pet_periodicity = {
+    #         'Uniformidade e verificação da calibração do sistema PET-CT': 'Mensal',
+    #         'Normalização e Calibração cruzada': 'Trimestral',
+    #         'Resolução espacial': 'Semestral',
+    #         'Sensibilidade': 'Semestral',
+    #         'Corregistro das imagens de PET e CT': 'Semestral',
+    #         '''Desempenho da taxa de contagens (NECR), 
+    #         taxa de eventos aleatórios, espalhados e verdadeiros, 
+    #         fração de espalhamento e 
+    #         exatidão das correções de eventos aleatórios e de perda de contagens''': 'Anual',
+    #         'Desempenho geral e exatidão das correções de atenuação e espalhamento': 'Anual',
+    #     }
+    #     return list_tests_pet_periodicity
     
-    def _set_curiometro_tests(self):
-        list_tests_curiometro_periodicity = {
-            'Reprodutibilidade': 'Mensal',
-            'Precisão e exatidão': 'Semestral',
-            'Linearidade': 'Semestral',
-            'Geometria': 'Anual'
-        }
-        return list_tests_curiometro_periodicity
+    # def _set_curiometro_tests(self):
+    #     list_tests_curiometro_periodicity = {
+    #         'Reprodutibilidade': 'Mensal',
+    #         'Precisão e exatidão': 'Semestral',
+    #         'Linearidade': 'Semestral',
+    #         'Geometria': 'Anual'
+    #     }
+    #     return list_tests_curiometro_periodicity
     
-    def _set_gm_tests(self):
-        list_tests_gm_periodicity = {
-            'Reprodutibilidade': 'Mensal'
-        }
-        return list_tests_gm_periodicity
+    # def _set_gm_tests(self):
+    #     list_tests_gm_periodicity = {
+    #         'Reprodutibilidade': 'Mensal'
+    #     }
+    #     return list_tests_gm_periodicity
     
-    def _set_gp_tests(self):
-        list_tests_gp_periodicity = {
-            'Repetibilidade': 'Semestral'
-        }
-        return list_tests_gp_periodicity
+    # def _set_gp_tests(self):
+    #     list_tests_gp_periodicity = {
+    #         'Repetibilidade': 'Semestral'
+    #     }
+    #     return list_tests_gp_periodicity
     
     def _next_test(self, name, date):
-        list_tests_periodicity = {**self.list_tests_gc_periodicity, **self.list_tests_pet_periodicity, **self.list_tests_curiometro_periodicity, **self.list_tests_gm_periodicity, **self.list_tests_gp_periodicity}
+        list_tests_periodicity = self.tests_periodicity.full_list()
         periodicity = list_tests_periodicity[name]
         if periodicity == 'Mensal':
             return date + pd.DateOffset(months=1)
@@ -121,15 +123,15 @@ class FormMongoDB():
             with st.form(key=type_form, clear_on_submit=True, border=False):
                 
                 if test['Equipamento'] in ['FMMNINFINIA', 'FMMNMILLENNIUM', 'FMMNVENTRI']:
-                    test['Nome'] = st.selectbox('Nome do Teste', list(self.list_tests_gc_periodicity.keys()), key=type_form + '_nome')
+                    test['Nome'] = st.selectbox('Nome do Teste', list(self.tests_periodicity.list_tests_gc_periodicity.keys()), key=type_form + '_nome')
                 elif test['Equipamento'] == 'FMMNPETCT':
-                    test['Nome'] = st.selectbox('Nome do Teste', list(self.list_tests_pet_periodicity.keys()), key=type_form + '_nome')
+                    test['Nome'] = st.selectbox('Nome do Teste', list(self.tests_periodicity.list_tests_pet_periodicity.keys()), key=type_form + '_nome')
                 elif test['Equipamento'] in ['GM 1', 'GM 2', 'GM 3', 'GM 4', 'GM 5']:
-                    test['Nome'] = st.selectbox('Nome do Teste', list(self.list_tests_gm_periodicity.keys()), key=type_form + '_nome')
+                    test['Nome'] = st.selectbox('Nome do Teste', list(self.tests_periodicity.list_tests_gm_periodicity.keys()), key=type_form + '_nome')
                 elif test['Equipamento'] in ['Gamma Probe Verde', 'Gamma Probe Amarela', 'Gamma Probe Branca']:
-                    test['Nome'] = st.selectbox('Nome do Teste', list(self.list_tests_gp_periodicity.keys()), key=type_form + '_nome')
+                    test['Nome'] = st.selectbox('Nome do Teste', list(self.tests_periodicity.list_tests_gp_periodicity.keys()), key=type_form + '_nome')
                 elif test['Equipamento'] in ['Curiômetro MN', 'Curiômetro PET']:
-                    test['Nome'] = st.selectbox('Nome do Teste', list(self.list_tests_curiometro_periodicity.keys()), key=type_form + '_nome')
+                    test['Nome'] = st.selectbox('Nome do Teste', list(self.tests_periodicity.list_tests_curiometro_periodicity.keys()), key=type_form + '_nome')
                     
                 test['Data de realização'] = pd.to_datetime(st.date_input('Data de realização'), format='DD/MM/YYYY')
                 

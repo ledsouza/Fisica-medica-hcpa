@@ -11,44 +11,7 @@ from data_processing.stylized_table import StylizedCQ
 from data_processing.filters import filters_archivation
 from forms import FormMongoDB
 from datetime import datetime
-from tests_periodicity import map_gc_periodicity
-
-list_tests_gc_periodicity = {
-    'Uniformidade intrínseca para alta densidade de contagem': 'Mensal',
-    'Resolução e linearidade espacial intrínseca': 'Mensal',
-    'Centro de rotação LEHR': 'Mensal',
-    'Centro de rotação MEGP': 'Mensal',
-    'Centro de rotação HEGP': 'Mensal',
-    'Resolução energética Tc-99m': 'Semestral',
-    'Resolução energética Tl-201': 'Semestral',
-    'Resolução energética Ga-67': 'Semestral',
-    'Resolução energética I-131': 'Semestral',
-    'Taxa máxima de contagem': 'Semestral',
-    'Resolução espacial íntriseca para fontes multi-energética I-131': 'Semestral',
-    'Resolução espacial íntriseca para fontes multi-energética Ga-67': 'Semestral',
-    'Resolução espacial íntriseca para fontes multi-energética Tl-201': 'Semestral',
-    'Corregistro espacial para fontes multi-energéticas Ga-67': 'Semestral',
-    'Corregistro espacial para fontes multi-energéticas Tl-201': 'Semestral',
-    'Sensibilidade planar Tc-99m': 'Semestral',
-    'Sensibilidade planar Ga-67': 'Semestral',
-    'Sensibilidade planar I-131': 'Semestral',
-    'Sensibilidade planar Tl-201': 'Semestral',
-    'Uniformidade extrínseca para alta densidade de contagem LEHR': 'Semestral',
-    'Uniformidade extrínseca para alta densidade de contagem MEGP': 'Semestral',
-    'Uniformidade extrínseca para alta densidade de contagem HEGP': 'Semestral',
-    'Verificação da angulação dos furos LEHR': 'Semestral',
-    'Verificação da angulação dos furos MEGP': 'Semestral',
-    'Verificação da angulação dos furos HEGP': 'Semestral',
-    'Velocidade da mesa em varreduras de corpo inteiro': 'Semestral',
-    'Desempenho geral da câmara SPECT': 'Semestral',
-    'Uniformidade íntrinseca para I-131': 'Anual',
-    'Uniformidade íntrinseca para Ga-67': 'Anual',
-    'Uniformidade íntrinseca para Tl-201': 'Anual',
-    'Uniformidade intrínseca com janelas energéticas assimétricas': 'Anual',
-    'Resolução e linearidade espacial extrínseca LEHR': 'Anual',
-    'Resolução e linearidade espacial extrínseca MEGP': 'Anual',
-    'Resolução e linearidade espacial extrínseca HEGP': 'Anual'
-}
+from tests_periodicity import TestsPeriodicity
 
 st.set_page_config(page_title="Gerência de Controle de Qualidade", layout="wide")
 # Open an image file
@@ -156,17 +119,18 @@ with indicadores:
             test_done.sort_values(by='Data de realização', ascending=False, inplace=True)
             test_done['Data da próxima realização'] = data_da_proxima_realizacao
             test_done = test_done.iloc[[0]]
+            tests_periodicity = TestsPeriodicity()
             
-            if map_gc_periodicity(test['Nome']) == 'Mensal':
+            if tests_periodicity.map_gc_periodicity(test['Nome']) == 'Mensal':
                 test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=29)
-            elif map_gc_periodicity(test['Nome']) == 'Trimestral':
+            elif tests_periodicity.map_gc_periodicity(test['Nome']) == 'Trimestral':
                 test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=91)
-            elif map_gc_periodicity(test['Nome']) == 'Semestral':
+            elif tests_periodicity.map_gc_periodicity(test['Nome']) == 'Semestral':
                 test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=182)
-            elif map_gc_periodicity(test['Nome']) == 'Anual':
+            elif tests_periodicity.map_gc_periodicity(test['Nome']) == 'Anual':
                 test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=366)            
             
