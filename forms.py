@@ -68,11 +68,10 @@ class FormMongoDB():
                     if type_form == 'registration':
                         # Removing 'Arquivado' key to check if the test is already inserted
                         check_test = test.fromkeys(['Equipamento', 'Nome', 'Data de realização'])
-                        check_test = test['Equipamento']
-                        check_test = test['Nome']
-                        check_test = test['Data de realização']
-                        st.write(check_test)
-                        if self.collection.find_one(check_test) is not None:
+                        check_test['Equipamento'] = test['Equipamento']
+                        check_test['Nome'] = test['Nome']
+                        check_test['Data de realização'] = test['Data de realização']
+                        if self.collection.find_one(test) is not None:
                             st.error('Teste já inserido!')
                             self.client.close()
                         else:
