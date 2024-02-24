@@ -5,3 +5,4 @@ secrets.toml
 *.tfstate
 *.tfvars
 notebooks/
+__pycache__/
