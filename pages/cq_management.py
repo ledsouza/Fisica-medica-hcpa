@@ -215,9 +215,9 @@ with indicadores:
     with col1:
         st.metric(label='Total de testes para realizar', value=f'{total_due}')
     with col2:
-        st.metric(label='Indicador de Realização', value=f'{indicador_realizacao:.2f}%'.replace('.', ','))
+        st.metric(label='Indicador de Realização Total', value=f'{indicador_realizacao:.2f}%'.replace('.', ','))
     with col3:
-        st.metric(label='Indicador de Arquivamento', value=f'{indicador_arquivamento:.2f}%'.replace('.', ','))
+        st.metric(label='Indicador de Arquivamento Total', value=f'{indicador_arquivamento:.2f}%'.replace('.', ','))
 
     tab_realizacao, tab_arquivamento = st.tabs(['Realização por equipamento', 'Arquivamento por equipamento'])
     done_df = pd.DataFrame(tests_done_current_month)

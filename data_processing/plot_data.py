@@ -24,15 +24,19 @@ def plot_indicadores(done_df: pd.DataFrame, due_df: pd.DataFrame, indicador: str
                                     y=realizacao_equipamento["Equipamento"], 
                                     orientation='h',
                                     name='',
+                                    textfont=dict(size=14),
                                     text=realizacao_equipamento[column].apply(lambda x: f'{x:.2f}%'.replace('.', ',')),
                                     textposition='inside',
                                     hoverinfo='none'
                         )])
         fig.update_layout(title=title, 
-                        xaxis_title=f"{column} (%)", 
-                        yaxis_title="Equipamento",
-                        xaxis=dict(range=[0, 100], fixedrange=True),
-                        height=600
+                        xaxis_title="", 
+                        xaxis_title_font=dict(size=16),
+                        xaxis=dict(range=[0, 101], fixedrange=True, tickfont=dict(size=14)),
+                        yaxis_title="",
+                        yaxis=dict(tickfont=dict(size=14)),
+                        title_font=dict(size=24),
+                        height=700
                         )
         st.plotly_chart(fig, use_container_width=True)
 
