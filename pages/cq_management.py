@@ -34,7 +34,8 @@ except Exception as e:
     print(e)
     
 db = client['cq_gestao']
-    
+
+# Aba de indicadores
 indicadores, arquivamento, registrar_teste, remover_teste = st.tabs(['Indicadores',
                                                                     'Arquivamento',
                                                                     'Registrar teste',
@@ -43,8 +44,8 @@ indicadores, arquivamento, registrar_teste, remover_teste = st.tabs(['Indicadore
 with indicadores:
     collection = db['testes']
     
-    col1, col2 = st.columns(2)
-    
+    # Selectbox para escolher o ano e mês
+    col1, col2 = st.columns(2) 
     with col1:
         pipeline = [
             {
@@ -82,6 +83,7 @@ with indicadores:
         months_key = st.selectbox('Selecione o mês', months.keys(), index=(current_month - 1))
         month = months[months_key]
     
+    # Query para buscar os testes que estão para vencer
     previous_year = year - 2
     begin_period = datetime(previous_year, month, 1)
     if month == 12:
@@ -96,13 +98,16 @@ with indicadores:
     }
     tests_to_due = collection.find(query, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1}).sort('Data da próxima realização', pymongo.DESCENDING)
 
+    # Query para buscar os testes que foram realizados no mês corrente
     tests_to_do_current_month = pd.DataFrame()
     tests_to_due_current_month = []
     tests_done_current_month = []
     for test in tests_to_due:
-        tuple_test = (test['Equipamento'], test['Nome'])
-        if tuple_test not in tests_to_due_current_month:
-            test_check = tests_to_due_current_month.append(tuple_test)
+        # Como estão ordenados por data da próxima realização, o primeiro teste de cada equipamento é o mais recente
+        # e o que está para vencer no mês corrente.
+        recent_to_due = (test['Equipamento'], test['Nome'])
+        if recent_to_due not in tests_to_due_current_month:
+            tests_to_due_current_month.append(recent_to_due) # Adiciona o teste que está para vencer no mês corrente
         else:
             continue
         data_da_proxima_realizacao = test.pop('Data da próxima realização')
