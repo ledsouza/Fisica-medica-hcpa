@@ -128,7 +128,7 @@ with indicadores:
             test_done['Data da próxima realização'] = data_da_proxima_realizacao
             test_done = test_done.iloc[[0]]
             
-            # Verificar se o teste está atrasado
+            # Verificar se o teste precisa ser realizado
             tests_periodicity = TestsPeriodicity().full_list()
             if tests_periodicity[test['Nome']] == 'Mensal':
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=29)
@@ -139,6 +139,7 @@ with indicadores:
             elif tests_periodicity[test['Nome']] == 'Anual':
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=366)            
             
+            # Adicionar o teste que precisa ser realizado no mês corrente
             if test_done['is_expired'].values[0]:
                 test_done.drop(columns='is_expired', inplace=True)
                 tests_to_do_current_month = pd.concat([tests_to_do_current_month, test_done])
@@ -147,6 +148,7 @@ with indicadores:
         else:
             continue
     
+    # Verificar presença de materiais para realização dos testes
     due_df = pd.DataFrame(tests_to_due_current_month, columns=['Equipamento', 'Nome'])
     due_df['Sem material'] = False
     tests_to_do_current_month['Sem material'] = False
@@ -185,7 +187,7 @@ with indicadores:
         tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'I-131' in x else False)
         due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'I-131' in x else False)
     
-    
+    # Formatar o dataframe para exibição
     tests_to_do_current_month.rename(columns={'Data de realização': 'Data da última realização', 'Data da próxima realização': 'Data de realização esperada'}, inplace=True)
     tests_to_do_current_month.sort_values(by=['Sem material','Data de realização esperada'], inplace=True)
     s_tests_to_do_current_month = tests_to_do_current_month.drop(columns='Arquivado').style
@@ -196,15 +198,17 @@ with indicadores:
         }
     )
     
+    # Exibir os testes que estão para vencer no mês corrente
     st.dataframe(s_tests_to_do_current_month, hide_index=True, use_container_width=True)
 
-    mask = (tests_to_do_current_month['Sem material'] == True) 
-    total_done = len(tests_done_current_month) + len(tests_to_do_current_month[mask])
+    # Calcular os indicadores
+    total_done = len(tests_done_current_month)
     
     mask = (tests_to_do_current_month['Sem material'] == False) 
     total_due = len(tests_to_do_current_month[mask])
     
-    total_tests = len(tests_to_due_current_month)
+    total_tests = due_df[due_df['Sem material'] == False].shape[0]
+    #total_tests = len(tests_to_due_current_month)
         
     indicador_realizacao = total_done / (total_tests) * 100
     
