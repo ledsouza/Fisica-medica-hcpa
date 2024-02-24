@@ -110,7 +110,7 @@ with indicadores:
             tests_to_due_current_month.append(recent_to_due) # Adiciona o teste que está para vencer no mês corrente
         else:
             continue
-        data_da_proxima_realizacao = test.pop('Data da próxima realização')
+        data_da_proxima_realizacao = test.pop('Data da próxima realização') # Armazenar a data de realização prevista para o teste
         query = {
             "Data de realização": {
                 "$gte": begin_period,
@@ -122,11 +122,14 @@ with indicadores:
         test_done = pd.DataFrame(list(result))
         
         if not test_done.empty:
+            # Ordenar os testes realizados por data de realização
+            # O teste mais recente é o primeiro da lista
             test_done.sort_values(by='Data de realização', ascending=False, inplace=True)
             test_done['Data da próxima realização'] = data_da_proxima_realizacao
             test_done = test_done.iloc[[0]]
-            tests_periodicity = TestsPeriodicity().full_list()
             
+            # Verificar se o teste está atrasado
+            tests_periodicity = TestsPeriodicity().full_list()
             if tests_periodicity[test['Nome']] == 'Mensal':
                 test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=29)
