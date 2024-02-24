@@ -131,16 +131,12 @@ with indicadores:
             # Verificar se o teste está atrasado
             tests_periodicity = TestsPeriodicity().full_list()
             if tests_periodicity[test['Nome']] == 'Mensal':
-                test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=29)
             elif tests_periodicity[test['Nome']] == 'Trimestral':
-                test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=91)
             elif tests_periodicity[test['Nome']] == 'Semestral':
-                test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=182)
             elif tests_periodicity[test['Nome']] == 'Anual':
-                test_done['diff'] = (test_done['Data da próxima realização'] - test_done['Data de realização']).dt.days
                 test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=366)            
             
             if test_done['is_expired'].values[0]:
@@ -150,7 +146,6 @@ with indicadores:
                 tests_done_current_month.append(test_done.to_dict('records')[0])
         else:
             continue
-    tests_to_do_current_month.drop(columns='diff', inplace=True)
     
     due_df = pd.DataFrame(tests_to_due_current_month, columns=['Equipamento', 'Nome'])
     due_df['Sem material'] = False
