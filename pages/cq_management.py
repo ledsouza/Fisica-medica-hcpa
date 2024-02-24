@@ -188,18 +188,21 @@ with indicadores:
         due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'I-131' in x else False)
     
     # Formatar o dataframe para exibição
-    tests_to_do_current_month.rename(columns={'Data de realização': 'Data da última realização', 'Data da próxima realização': 'Data de realização esperada'}, inplace=True)
-    tests_to_do_current_month.sort_values(by=['Sem material','Data de realização esperada'], inplace=True)
-    s_tests_to_do_current_month = tests_to_do_current_month.drop(columns='Arquivado').style
-    s_tests_to_do_current_month.format(
-        {
-            'Data da última realização': '{:%d/%m/%Y}',
-            'Data de realização esperada': '{:%d/%m/%Y}'
-        }
-    )
-    
-    # Exibir os testes que estão para vencer no mês corrente
-    st.dataframe(s_tests_to_do_current_month, hide_index=True, use_container_width=True)
+    if not tests_to_do_current_month.empty:
+        tests_to_do_current_month.rename(columns={'Data de realização': 'Data da última realização', 'Data da próxima realização': 'Data de realização esperada'}, inplace=True)
+        tests_to_do_current_month.sort_values(by=['Sem material','Data de realização esperada'], inplace=True)
+        s_tests_to_do_current_month = tests_to_do_current_month.drop(columns='Arquivado').style
+        s_tests_to_do_current_month.format(
+            {
+                'Data da última realização': '{:%d/%m/%Y}',
+                'Data de realização esperada': '{:%d/%m/%Y}'
+            }
+        )
+        
+        # Exibir os testes que estão para vencer no mês corrente
+        st.dataframe(s_tests_to_do_current_month, hide_index=True, use_container_width=True)
+    else:
+        st.success('Todos os testes realizados!')
 
     # Calcular os indicadores
     total_done = len(tests_done_current_month)
@@ -239,7 +242,6 @@ with indicadores:
         plot_indicadores(archived_df, due_df, indicador='arquivados')
 
 # Arquivamento de testes
-
 if 'teste_archivation' not in st.session_state:
     st.session_state.teste_archivation = False
 
