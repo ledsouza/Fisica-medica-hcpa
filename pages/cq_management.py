@@ -12,6 +12,7 @@ from data_processing.filters import filters_archivation
 from forms import FormMongoDB
 from datetime import datetime
 from tests_periodicity import TestsPeriodicity
+import plotly.graph_objects as go
 
 st.set_page_config(page_title="Gerência de Controle de Qualidade", layout="wide")
 # Open an image file
@@ -143,6 +144,8 @@ with indicadores:
             continue
     tests_to_do_current_month.drop(columns='diff', inplace=True)
     
+    due_df = pd.DataFrame(tests_to_due_current_month, columns=['Equipamento', 'Nome'])
+    due_df['Sem material'] = False
     tests_to_do_current_month['Sem material'] = False
     with st.sidebar:
         st.markdown('Materiais ausentes para realização dos testes:')
@@ -153,18 +156,31 @@ with indicadores:
     
     if materials['Ga-67'] and materials['Tl-201'] and materials['I-131']:
         tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x or 'I-131' in x else False)
+        due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x or 'I-131' in x else False)
+
     if materials['Ga-67'] and materials['Tl-201'] and not materials['I-131']:
         tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x else False)
+        due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x else False)
+
     if materials['Ga-67'] and not materials['Tl-201'] and materials['I-131']:
         tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x or 'I-131' in x else False)
+        due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Ga-67' in x or 'I-131' in x else False)
+
     if not materials['Ga-67'] and materials['Tl-201'] and materials['I-131']:
         tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Tl-201' in x or 'I-131' in x else False)
+        due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Tl-201' in x or 'I-131' in x else False)
+
     if materials['Ga-67'] and not materials['Tl-201'] and not materials['I-131']:
         tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x else False)
+        due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Ga-67' in x else False)
+
     if not materials['Ga-67'] and materials['Tl-201'] and not materials['I-131']:
         tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Tl-201' in x else False)
+        due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Tl-201' in x else False)
+
     if not materials['Ga-67'] and not materials['Tl-201'] and materials['I-131']:
         tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'I-131' in x else False)
+        due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'I-131' in x else False)
     
     
     tests_to_do_current_month.rename(columns={'Data de realização': 'Data da última realização', 'Data da próxima realização': 'Data de realização esperada'}, inplace=True)
@@ -202,7 +218,53 @@ with indicadores:
         st.metric(label='Indicador de Realização', value=f'{indicador_realizacao:.2f}%'.replace('.', ','))
     with col3:
         st.metric(label='Indicador de Arquivamento', value=f'{indicador_arquivamento:.2f}%'.replace('.', ','))
+
+    tab_realizacao, tab_arquivamento = st.tabs(['Realização por equipamento', 'Arquivamento por equipamento'])
+    done_df = pd.DataFrame(tests_done_current_month)
+    done_df = done_df[['Equipamento', 'Nome', 'Arquivado']]
+    due_df = due_df[due_df['Sem material'] == False]
+
+    def plot_indicadores(done_df: pd.DataFrame, due_df: pd.DataFrame, indicador: str):
+        if indicador == 'realizados':
+            title = 'Indicador de Realização por Equipamento'
+            column = 'Indicador de Realização'
+        elif indicador == 'arquivados':
+            title = 'Indicador de Arquivamento por Equipamento'
+            column = 'Indicador de Arquivamento'
+        else:
+            raise ValueError('Tipo de indicador inválido')
+        
+        grouped_done_df = done_df.groupby(['Equipamento']).size().reset_index(name='Realizados')
+        grouped_due_df = due_df.groupby(['Equipamento']).size().reset_index(name='Previstos')
+        realizacao_equipamento = pd.merge(grouped_done_df, grouped_due_df, on='Equipamento', how='outer')
+        realizacao_equipamento.fillna(0, inplace=True)
+        realizacao_equipamento[column] = realizacao_equipamento['Realizados'] / realizacao_equipamento['Previstos'] * 100
+        realizacao_equipamento.sort_values(by=column, ascending=True, inplace=True)
+
+        fig = go.Figure(data=[go.Bar(x=realizacao_equipamento[column], 
+                                    y=realizacao_equipamento["Equipamento"], 
+                                    orientation='h',
+                                    name='',
+                                    text=realizacao_equipamento[column].apply(lambda x: f'{x:.2f}%'.replace('.', ',')),
+                                    textposition='inside',
+                                    hoverinfo='none'
+                        )])
+        fig.update_layout(title=title, 
+                        xaxis_title=f"{column} (%)", 
+                        yaxis_title="Equipamento",
+                        xaxis=dict(range=[0, 100], fixedrange=True),
+                        height=600
+                        )
+        st.plotly_chart(fig, use_container_width=True)
     
+    # Indicador de realização por equipamento
+    with tab_realizacao:
+        plot_indicadores(done_df, due_df, indicador='realizados')
+
+    # Indicador de arquivamento por equipamento
+    with tab_arquivamento:
+        archived_df = done_df[done_df['Arquivado'] == True]
+        plot_indicadores(archived_df, due_df, indicador='arquivados')
 
 if 'teste_archivation' not in st.session_state:
     st.session_state.teste_archivation = False
