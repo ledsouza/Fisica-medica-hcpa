@@ -3,6 +3,39 @@ import numpy as np
 import plotly.graph_objects as go
 import streamlit as st
 
+def plot_indicadores(done_df: pd.DataFrame, due_df: pd.DataFrame, indicador: str):
+        if indicador == 'realizados':
+            title = 'Indicador de Realização por Equipamento'
+            column = 'Indicador de Realização'
+        elif indicador == 'arquivados':
+            title = 'Indicador de Arquivamento por Equipamento'
+            column = 'Indicador de Arquivamento'
+        else:
+            raise ValueError('Tipo de indicador inválido')
+        
+        grouped_done_df = done_df.groupby(['Equipamento']).size().reset_index(name='Realizados')
+        grouped_due_df = due_df.groupby(['Equipamento']).size().reset_index(name='Previstos')
+        realizacao_equipamento = pd.merge(grouped_done_df, grouped_due_df, on='Equipamento', how='outer')
+        realizacao_equipamento.fillna(0, inplace=True)
+        realizacao_equipamento[column] = realizacao_equipamento['Realizados'] / realizacao_equipamento['Previstos'] * 100
+        realizacao_equipamento.sort_values(by=column, ascending=True, inplace=True)
+
+        fig = go.Figure(data=[go.Bar(x=realizacao_equipamento[column], 
+                                    y=realizacao_equipamento["Equipamento"], 
+                                    orientation='h',
+                                    name='',
+                                    text=realizacao_equipamento[column].apply(lambda x: f'{x:.2f}%'.replace('.', ',')),
+                                    textposition='inside',
+                                    hoverinfo='none'
+                        )])
+        fig.update_layout(title=title, 
+                        xaxis_title=f"{column} (%)", 
+                        yaxis_title="Equipamento",
+                        xaxis=dict(range=[0, 100], fixedrange=True),
+                        height=600
+                        )
+        st.plotly_chart(fig, use_container_width=True)
+
 class DataPlotting:
     def __init__(self, data: pd.DataFrame):
         self.data = self._viz_data(data)
