@@ -203,12 +203,9 @@ with indicadores:
 
     # Calcular os indicadores
     total_done = len(tests_done_current_month)
-    
     mask = (tests_to_do_current_month['Sem material'] == False) 
     total_due = len(tests_to_do_current_month[mask])
-    
     total_tests = due_df[due_df['Sem material'] == False].shape[0]
-    #total_tests = len(tests_to_due_current_month)
         
     indicador_realizacao = total_done / (total_tests) * 100
     
@@ -226,6 +223,7 @@ with indicadores:
     with col3:
         st.metric(label='Indicador de Arquivamento Total', value=f'{indicador_arquivamento:.2f}%'.replace('.', ','))
 
+    # Abas para exibir os indicadores de realização e arquivamento por equipamento com visualização de gráfica
     tab_realizacao, tab_arquivamento = st.tabs(['Realização por equipamento', 'Arquivamento por equipamento'])
     done_df = pd.DataFrame(tests_done_current_month)
     done_df = done_df[['Equipamento', 'Nome', 'Arquivado']]
@@ -239,6 +237,8 @@ with indicadores:
     with tab_arquivamento:
         archived_df = done_df[done_df['Arquivado'] == True]
         plot_indicadores(archived_df, due_df, indicador='arquivados')
+
+# Arquivamento de testes
 
 if 'teste_archivation' not in st.session_state:
     st.session_state.teste_archivation = False
@@ -301,8 +301,6 @@ with arquivamento:
             st.rerun()
         else:
             st.error('Erro ao atualizar o status de arquivamento!')
-            
-    
     
 with registrar_teste:
     FormMongoDB(client).form_widget('registration')
