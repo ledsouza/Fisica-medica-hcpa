@@ -47,6 +47,17 @@ class UsersManagement:
             self.authenticator.logout("Log out", "sidebar")
         except Exception as e:
             st.error(e)
+            
+    def get_user_info(self) -> None:
+        with st.container(border=True):
+            users = self.config['credentials']['usernames']
+            st.write(f'## Usuários registrados')
+            for user, user_info in users.items():
+                st.write(f'### {user}')
+                st.write(f'**Nome:** {user_info["name"]}')
+                st.write(f'**Email:** {user_info["email"]}')
+
+            
 
     def forgot_password_widget(self) -> None:
         try:

@@ -50,5 +50,7 @@ else:
             deseje fornecer alguma sugestão, por favor, entre em contato através do e-mail: <b>leandro.souza.159@gmail.com</b>.
             </div>
             ''', unsafe_allow_html=True)
+    st.write('') # small space between
+    user_management.get_user_info()
 
 menu()
