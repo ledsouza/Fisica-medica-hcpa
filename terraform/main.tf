@@ -27,6 +27,11 @@ variable "secret_access_key_value" {
     type        = string
 }
 
+variable "mongodb_password_value" {
+    description = "The MongoDB password"
+    type        = string
+}
+
 resource "google_secret_manager_secret" "access_key" {
   secret_id = "access_key_id"
   replication {
@@ -63,6 +68,18 @@ resource "google_secret_manager_secret_version" "default_region" {
   secret_data = var.aws_region_value
 }
 
+resource "google_secret_manager_secret" "mongodb_password" {
+  secret_id = "mongodb_password_id"
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "mongodb_password" {
+  secret      = google_secret_manager_secret.mongodb_password.id
+  secret_data = var.mongodb_password_value
+}
+
 resource "google_service_account" "account" {
   account_id = "fisica-medica-hcpa"
   display_name = "Service account for Cloud Run"
@@ -87,6 +104,13 @@ resource "google_secret_manager_secret_iam_member" "default_region" {
   role      = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${google_service_account.account.email}"
   depends_on = [google_secret_manager_secret.default_region]
+}
+
+resource "google_secret_manager_secret_iam_member" "mongodb_password" {
+  secret_id = google_secret_manager_secret.mongodb_password.id
+  role      = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.account.email}"
+  depends_on = [google_secret_manager_secret.mongodb_password]
 }
 
 resource "google_cloud_run_v2_service" "default" {
@@ -125,6 +149,15 @@ resource "google_cloud_run_v2_service" "default" {
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.default_region.secret_id
+            version = "latest"
+          }
+        }
+      }
+      env {
+        name = "MONGODB_PASSWORD"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.mongodb_password.secret_id
             version = "latest"
           }
         }
