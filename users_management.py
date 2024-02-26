@@ -51,7 +51,7 @@ class UsersManagement:
     def get_user_info(self) -> None:
         with st.container(border=True):
             users = self.config['credentials']['usernames']
-            st.write(f'## Usuários registrados')
+            st.write(f'## Usuários cadastrados')
             for user, user_info in users.items():
                 st.write(f'### {user}')
                 st.write(f'**Nome:** {user_info["name"]}')
