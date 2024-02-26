@@ -27,6 +27,11 @@ variable "secret_access_key_value" {
     type        = string
 }
 
+variable "mongodb_acess_key_value" {
+    description = "The MongoDB access key"
+    type        = string
+}
+
 resource "google_secret_manager_secret" "access_key" {
   secret_id = "access_key_id"
   replication {
@@ -63,6 +68,18 @@ resource "google_secret_manager_secret_version" "default_region" {
   secret_data = var.aws_region_value
 }
 
+resource "google_secret_manager_secret" "mongodb_access_key {
+  secret_id = "mongodb_access_key_id"
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "mongodb_access_key" {
+  secret      = google_secret_manager_secret.mongodb_access_key.id
+  secret_data = var.mongodb_acess_key_value
+}
+
 resource "google_service_account" "account" {
   account_id = "fisica-medica-hcpa"
   display_name = "Service account for Cloud Run"
@@ -89,6 +106,13 @@ resource "google_secret_manager_secret_iam_member" "default_region" {
   depends_on = [google_secret_manager_secret.default_region]
 }
 
+resource "google_secret_manager_secret_iam_member" "mongodb_access_key" {
+  secret_id = google_secret_manager_secret.mongodb_access_key.id
+  role      = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.account.email}"
+  depends_on = [google_secret_manager_secret.mongodb_access_key]
+}
+
 resource "google_cloud_run_v2_service" "default" {
   name     = "mnmanagement"
   location = "us-central1"
@@ -96,7 +120,7 @@ resource "google_cloud_run_v2_service" "default" {
 
   template {
     containers {
-      image = "us-central1-docker.pkg.dev/fisica-medica-hcpa/fisica-medica-repo/mnmanagement:1.1.1"
+      image = "us-central1-docker.pkg.dev/fisica-medica-hcpa/fisica-medica-repo/mnmanagement:1.2.0"
 
       ports {
         container_port = 8501
@@ -129,10 +153,19 @@ resource "google_cloud_run_v2_service" "default" {
           }
         }
       }
-    }
+      env {
+        name = "MONGODB_ACCESS_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.mongodb_access_key.secret_id
+            version = "latest"
+          }
+        }
+      }
     service_account = google_service_account.account.email
+    }
+  depends_on = [google_secret_manager_secret_version.access_key, google_secret_manager_secret_version.secret_access_key, google_secret_manager_secret_version.default_region, google_secret_manager_secret_version.mongodb_access_key]
   }
-  depends_on = [google_secret_manager_secret_version.access_key, google_secret_manager_secret_version.secret_access_key, google_secret_manager_secret_version.default_region]
 }
 
 resource "google_cloud_run_v2_service_iam_member" "noauth" {
