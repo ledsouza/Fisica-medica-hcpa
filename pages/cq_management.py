@@ -234,12 +234,12 @@ with indicadores:
     
     # Indicador de realização por equipamento
     with tab_realizacao:
-        plot_indicadores(done_df, due_df, indicador='realizados')
+        plot_indicadores(done_df, due_df, indicador='realizados', month=months_key, year=year)
 
     # Indicador de arquivamento por equipamento
     with tab_arquivamento:
         archived_df = done_df[done_df['Arquivado'] == True]
-        plot_indicadores(archived_df, due_df, indicador='arquivados')
+        plot_indicadores(archived_df, due_df, indicador='arquivados', month=months_key, year=year)
 
 # Arquivamento de testes
 if 'teste_archivation' not in st.session_state:

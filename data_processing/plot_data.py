@@ -3,12 +3,12 @@ import numpy as np
 import plotly.graph_objects as go
 import streamlit as st
 
-def plot_indicadores(done_df: pd.DataFrame, due_df: pd.DataFrame, indicador: str):
+def plot_indicadores(done_df: pd.DataFrame, due_df: pd.DataFrame, indicador: str, year, month):
         if indicador == 'realizados':
-            title = 'Indicador de Realização por Equipamento'
+            title = f'Indicador de Realização por Equipamento<br><sup size=16>Período: {month} de {year}</sup>'
             column = 'Indicador de Realização'
         elif indicador == 'arquivados':
-            title = 'Indicador de Arquivamento por Equipamento'
+            title = f'Indicador de Arquivamento por Equipamento<br><sup size=16>Período: {month} de {year}</sup>'
             column = 'Indicador de Arquivamento'
         else:
             raise ValueError('Tipo de indicador inválido')
