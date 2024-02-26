@@ -1,26 +1,35 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
+from datetime import datetime
+
+def user_period_query():
+        begin_period = datetime.now().replace(day=1)
+        end_period = datetime.now().replace(day=1) + pd.DateOffset(months=1)
+        
+        selected_period = st.date_input(
+                label="Selecione o Período",
+                value=(begin_period, end_period),
+        )
+        try:
+            start_date, end_date = selected_period
+        except:
+            st.error("É necessário selecionar um período válido")
+            st.stop()
+        query = {
+            "Data de realização": {
+                "$gte": pd.to_datetime(selected_period[0], format='%Y-%m-%d'),
+                "$lt": pd.to_datetime(selected_period[1], format='%Y-%m-%d')
+            }
+        }
+        return query
 
 def filters_archivation(dataframe: pd.DataFrame):
     
-    
     equipamento = st.multiselect('Selecione o equipamento', dataframe['Equipamento'].unique(), default=dataframe['Equipamento'].unique())
-    periodo = st.date_input(
-            label="Selecione o Período",
-            min_value=dataframe["Data de realização"].min(),
-            max_value=dataframe["Data de realização"].max(),
-            value=(dataframe["Data de realização"].min(), dataframe["Data de realização"].max()),
-    )
-    try:
-        start_date, end_date = periodo
-    except:
-        st.error("É necessário selecionar um período válido")
-        st.stop()
     
     query = """
-            Equipamento in @equipamento and \
-            @periodo[0] <= `Data de realização` <= @periodo[1]
+            Equipamento in @equipamento
     """
     
     filtered_df = dataframe.query(query)
