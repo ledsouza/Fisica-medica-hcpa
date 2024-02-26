@@ -3,9 +3,8 @@ from PIL import Image
 from menu import menu
 from users_management import UsersManagement
 
-
 st.set_page_config(page_title="Home", layout="centered")
-# Open an image file
+# Open the logo file
 img = Image.open('Logo_SFMR_Horizontal_Centralizado.png')
 st.sidebar.image(img, use_column_width=True)
     
@@ -43,6 +42,13 @@ if st.session_state["authentication_status"] is False:
 elif st.session_state["authentication_status"] is None:
     st.warning('Por favor, preencha os campos de usuário e senha.')
 else:
-    st.write(f'# Bem-vindo, {st.session_state.name}!')
+    st.write(f'## Bem-vindo, {st.session_state.name}!')
+    st.write('''
+            <div style="text-align: justify;">
+            Este aplicativo foi desenvolvido para a análise de dados dos exames realizados e para a gestão do Programa de Controle de Qualidade dos equipamentos
+            de imagem do Serviço de Medicina Nuclear do Hospital de Clínicas de Porto Alegre. Desenvolvido por Leandro Souza. Caso encontre algum problema ou
+            deseje fornecer alguma sugestão, por favor, entre em contato através do e-mail: <b>leandro.souza.159@gmail.com</b>.
+            </div>
+            ''', unsafe_allow_html=True)
 
 menu()
