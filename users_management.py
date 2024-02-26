@@ -57,8 +57,6 @@ class UsersManagement:
                 st.write(f'**Nome:** {user_info["name"]}')
                 st.write(f'**Email:** {user_info["email"]}')
 
-            
-
     def forgot_password_widget(self) -> None:
         try:
             (
@@ -206,7 +204,7 @@ class UsersManagement:
     def _remove_user_submit(self, username: str) -> None:
         if username is None:
             st.error('Usuário não pode estar vazio')
-        elif username not in self.config['credentials']['usernames']:
+        elif self.config['credentials']['usernames'].get(username, False):
             st.error('Usuário não encontrado')
         else:
             del self.config['credentials']['usernames'][username]
@@ -220,7 +218,9 @@ class UsersManagement:
         with st.form('remove_user'):
             st.write('### Remover usuário')
             username = st.text_input('Usuário')
-            st.form_submit_button('Remover', on_click=self._remove_user_submit, args=(username,))
+            submit_button = st.form_submit_button('Remover')
+            if submit_button:
+                self._remove_user_submit(username)
             
     def _upload_file(self):
         """Upload a file to an S3 bucket

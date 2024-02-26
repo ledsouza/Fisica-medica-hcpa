@@ -52,5 +52,6 @@ else:
             ''', unsafe_allow_html=True)
     st.write('') # small space between
     user_management.get_user_info()
+    
 
 menu()
