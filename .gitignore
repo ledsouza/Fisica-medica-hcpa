@@ -6,3 +6,4 @@ secrets.toml
 *.tfvars
 notebooks/
 __pycache__/
+config.yaml

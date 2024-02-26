@@ -27,7 +27,7 @@ credentials:
     ledsouza:
       email: ledsouza@hcpa.edu.br
       logged_in: true
-      name: Leandro da Silva de Souza
+      name: Leandro Souza
       password: $2b$12$n0pLYqh/6rbGnP8EOZwUu.wimJuW0MOlZYjOLasUu2IKXX2XjJlOG
 preauthorized:
   emails:
