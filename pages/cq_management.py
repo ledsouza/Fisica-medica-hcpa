@@ -8,7 +8,7 @@ import pymongo
 import pandas as pd
 import time
 from data_processing.stylized_table import StylizedCQ
-from data_processing.filters import filters_archivation
+from data_processing.filters import filters_archivation, user_period_query
 from data_processing.plot_data import plot_indicadores
 from forms import FormMongoDB
 from datetime import datetime
@@ -46,6 +46,7 @@ with indicadores:
     
     # Selectbox para escolher o ano e mês
     col1, col2 = st.columns(2) 
+    
     with col1:
         pipeline = [
             {
@@ -250,7 +251,10 @@ def change_archive_status():
 
 with arquivamento:    
     teste_col = db['testes']
-    testes = pd.DataFrame(list(teste_col.find({}, {'_id': 0, 'Data da próxima realização': 0})))
+    
+    query = user_period_query()
+        
+    testes = pd.DataFrame(list(teste_col.find(query, {'_id': 0, 'Data da próxima realização': 0})))
     
     filtered_tests = filters_archivation(testes)
     
