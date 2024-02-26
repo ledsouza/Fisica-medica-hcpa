@@ -3,7 +3,7 @@ from PIL import Image
 from menu import menu
 from users_management import UsersManagement
 
-st.set_page_config(page_title="Home", layout="centered")
+st.set_page_config(page_title="Home", layout="wide")
 # Open the logo file
 img = Image.open('Logo_SFMR_Horizontal_Centralizado.png')
 st.sidebar.image(img, use_column_width=True)

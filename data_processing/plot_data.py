@@ -32,9 +32,10 @@ def plot_indicadores(done_df: pd.DataFrame, due_df: pd.DataFrame, indicador: str
         fig.update_layout(title=title, 
                         xaxis_title="", 
                         xaxis_title_font=dict(size=16),
-                        xaxis=dict(range=[0, 101], fixedrange=True, tickfont=dict(size=14)),
+                        xaxis=dict(range=[0, 105], fixedrange=True, tickfont=dict(size=14)),
+                        xaxis_showgrid=True,
                         yaxis_title="",
-                        yaxis=dict(tickfont=dict(size=14)),
+                        yaxis=dict(tickfont=dict(size=14), fixedrange=True),
                         title_font=dict(size=24),
                         height=700
                         )
