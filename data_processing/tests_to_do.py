@@ -4,8 +4,10 @@ from pymongo.cursor import Cursor
 from pymongo.collection import Collection
 from datetime import datetime
 from typing import Tuple
+import streamlit as st
 
-def current_month_done(tests_to_due: Cursor, begin_period: datetime, end_period: datetime, collection: Collection) -> Tuple[pd.DataFrame, list, list]:
+@st.cache_data
+def current_month_done(_tests_to_due: Cursor, begin_period: datetime, end_period: datetime, _collection: Collection) -> Tuple[pd.DataFrame, list, list]:
     """
     Retrieves the tests that have been done in the current month.
 
@@ -24,7 +26,7 @@ def current_month_done(tests_to_due: Cursor, begin_period: datetime, end_period:
     tests_to_do_current_month = pd.DataFrame()
     tests_to_due_current_month = []
     tests_done_current_month = []
-    for test in tests_to_due:
+    for test in _tests_to_due:
         # Como estão ordenados por data da próxima realização, o primeiro teste de cada equipamento é o mais recente
         # e o que está para vencer no mês corrente.
         recent_to_due = (test['Equipamento'], test['Nome'])
@@ -40,7 +42,7 @@ def current_month_done(tests_to_due: Cursor, begin_period: datetime, end_period:
             },
             **test
         }
-        result = collection.find(query, {'_id': 0, 'Data da próxima realização': 0})
+        result = _collection.find(query, {'_id': 0, 'Data da próxima realização': 0})
         test_done = pd.DataFrame(list(result))
         
         if not test_done.empty:
