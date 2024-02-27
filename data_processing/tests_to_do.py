@@ -10,10 +10,13 @@ import streamlit as st
 @st.cache_resource(ttl=timedelta(hours=1), show_spinner='Obtendo os dados...')
 def current_month_due(_collection: Collection, query) -> Cursor:
     tests_to_due = _collection.find(query, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1}).sort('Data da próxima realização', pymongo.DESCENDING)
+    df_tests_to_due = pd.DataFrame(list(tests_to_due))
+    df_tests_to_due.drop_duplicates(subset=['Equipamento', 'Nome'], keep='first', inplace=True)
+    tests_to_due = df_tests_to_due.to_dict('records')
     return tests_to_due
 
 @st.cache_data(ttl=timedelta(hours=1), show_spinner='Obtendo os dados...')
-def current_month_done(_tests_to_due: Cursor, begin_period: datetime, end_period: datetime, _collection: Collection) -> Tuple[pd.DataFrame, list, list]:
+def current_month_done(tests_to_due: dict, begin_period: datetime, end_period: datetime, _collection: Collection) -> Tuple[pd.DataFrame, list, list]:
     """
     Retrieves the tests that have been done in the current month.
 
@@ -32,7 +35,7 @@ def current_month_done(_tests_to_due: Cursor, begin_period: datetime, end_period
     tests_to_do_current_month = pd.DataFrame()
     tests_to_due_current_month = []
     tests_done_current_month = []
-    for test in _tests_to_due:
+    for test in tests_to_due:
         # Como estão ordenados por data da próxima realização, o primeiro teste de cada equipamento é o mais recente
         # e o que está para vencer no mês corrente.
         recent_to_due = (test['Equipamento'], test['Nome'])

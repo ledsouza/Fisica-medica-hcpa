@@ -92,9 +92,11 @@ with indicadores:
             "$lt": end_period
         }
     }
-    
+    start_time = time.time()
     tests_to_due = current_month_due(collection, query)
     tests_to_do_current_month, tests_done_current_month, tests_to_due_current_month = current_month_done(tests_to_due, begin_period, end_period, collection)
+    end_time = time.time()
+    print(f'Time to run: {end_time - start_time} seconds')
     
     # Verificar presença de materiais para realização dos testes
     due_df = pd.DataFrame(tests_to_due_current_month, columns=['Equipamento', 'Nome'])
