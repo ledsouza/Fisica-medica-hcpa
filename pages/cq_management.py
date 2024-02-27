@@ -10,7 +10,7 @@ import time
 from data_processing.stylized_table import StylizedCQ
 from data_processing.filters import filters_archivation, user_period_query
 from data_processing.plot_data import plot_indicadores
-from data_processing.tests_to_do import current_month_done
+from data_processing.tests_to_do import current_month_done, current_month_due
 from forms import FormMongoDB
 from datetime import datetime
 from tests_periodicity import TestsPeriodicity
@@ -99,7 +99,7 @@ with indicadores:
         }
     }
     
-    tests_to_due = collection.find(query, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1}).sort('Data da próxima realização', pymongo.DESCENDING)
+    tests_to_due = current_month_due(collection, query)
     
     tests_to_do_current_month, tests_done_current_month, tests_to_due_current_month = current_month_done(tests_to_due, begin_period, end_period, collection)
     
