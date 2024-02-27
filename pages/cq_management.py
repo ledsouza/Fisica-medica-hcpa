@@ -4,7 +4,6 @@ from menu import menu_with_redirect
 import os
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-import pymongo
 import pandas as pd
 import time
 from data_processing.stylized_table import StylizedCQ
@@ -13,7 +12,6 @@ from data_processing.plot_data import plot_indicadores
 from data_processing.tests_to_do import current_month_done, current_month_due
 from forms import FormMongoDB
 from datetime import datetime
-from tests_periodicity import TestsPeriodicity
 
 st.set_page_config(page_title="Gerência de Controle de Qualidade", layout="wide")
 # Open an image file
@@ -100,8 +98,10 @@ with indicadores:
     }
     
     tests_to_due = current_month_due(collection, query)
-    
+    start_time = time.time()
     tests_to_do_current_month, tests_done_current_month, tests_to_due_current_month = current_month_done(tests_to_due, begin_period, end_period, collection)
+    end_time = time.time()
+    print(f'Time to run: {end_time - start_time} seconds')
     
     # Verificar presença de materiais para realização dos testes
     due_df = pd.DataFrame(tests_to_due_current_month, columns=['Equipamento', 'Nome'])
