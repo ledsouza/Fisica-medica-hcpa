@@ -4,7 +4,7 @@ import streamlit as st
 from datetime import datetime
 
 def user_period_query():
-        begin_period = datetime.now().replace(day=1)
+        begin_period = datetime.now().replace(day=1) - pd.DateOffset(months=6)
         end_period = datetime.now().replace(day=1) + pd.DateOffset(months=1)
         
         selected_period = st.date_input(
