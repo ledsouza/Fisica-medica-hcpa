@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 from typing import Tuple
 import streamlit as st
 
-@st.cache_resource(ttl=timedelta(hours=1), show_spinner='Obtendo os dados...')
-def current_month_due(_collection: Collection, query) -> Cursor:
+@st.cache_data(ttl=timedelta(hours=1), show_spinner='Obtendo os dados...')
+def current_month_due(_collection: Collection, query) -> dict:
     tests_to_due = _collection.find(query, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1}).sort('Data da próxima realização', pymongo.DESCENDING)
     df_tests_to_due = pd.DataFrame(list(tests_to_due))
     df_tests_to_due.drop_duplicates(subset=['Equipamento', 'Nome'], keep='first', inplace=True)
