@@ -169,13 +169,20 @@ with indicadores:
             total_archived -= 1
     indicador_arquivamento = total_archived / total_tests * 100
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric(label='Total de testes para realizar', value=f'{total_due}')
     with col2:
         st.metric(label='Indicador de Realização Total', value=f'{indicador_realizacao:.2f}%'.replace('.', ','))
     with col3:
         st.metric(label='Indicador de Arquivamento Total', value=f'{indicador_arquivamento:.2f}%'.replace('.', ','))
+    with col4:
+        def refresh_data():
+            current_month_due.clear()
+            current_month_done.clear()
+
+        st.markdown('<br>', unsafe_allow_html=True)
+        st.button('Atualizar dados', type='primary', key='update_cache', on_click=refresh_data)
 
     # Abas para exibir os indicadores de realização e arquivamento por equipamento com visualização de gráfica
     tab_realizacao, tab_arquivamento = st.tabs(['Realização por equipamento', 'Arquivamento por equipamento'])
