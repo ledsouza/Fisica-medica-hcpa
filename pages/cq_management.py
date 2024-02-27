@@ -84,12 +84,8 @@ with indicadores:
         month = months[months_key]
     
     # Query para buscar os testes que estão para vencer
-    previous_year = year - 2
-    begin_period = datetime(previous_year, month, 1)
-    if month == 12:
-        end_period = datetime(year+1, 1, 1)
-    else:
-        end_period = datetime(year, month+1, 1)
+    begin_period = datetime(year, month, 1) - pd.DateOffset(year=1)
+    end_period = datetime(year, month, 1) + pd.DateOffset(months=1)
     query = {
         "Data da próxima realização": {
             "$gte": begin_period,

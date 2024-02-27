@@ -8,7 +8,7 @@ from typing import Tuple
 import streamlit as st
 
 @st.cache_resource
-def current_month_due(_collection: Collection, query):
+def current_month_due(_collection: Collection, query) -> Cursor:
     tests_to_due = _collection.find(query, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1}).sort('Data da próxima realização', pymongo.DESCENDING)
     return tests_to_due
 
