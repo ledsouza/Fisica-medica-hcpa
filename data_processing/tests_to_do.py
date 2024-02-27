@@ -1,10 +1,16 @@
 import pandas as pd
 from tests_periodicity import TestsPeriodicity
+import pymongo
 from pymongo.cursor import Cursor
 from pymongo.collection import Collection
 from datetime import datetime
 from typing import Tuple
 import streamlit as st
+
+@st.cache_resource
+def current_month_due(_collection: Collection, query):
+    tests_to_due = _collection.find(query, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1}).sort('Data da próxima realização', pymongo.DESCENDING)
+    return tests_to_due
 
 @st.cache_data
 def current_month_done(_tests_to_due: Cursor, begin_period: datetime, end_period: datetime, _collection: Collection) -> Tuple[pd.DataFrame, list, list]:
