@@ -7,12 +7,12 @@ from datetime import datetime, timedelta
 from typing import Tuple
 import streamlit as st
 
-@st.cache_resource(ttl=timedelta(minutes=10), show_spinner='Obtendo os dados...')
+@st.cache_resource(ttl=timedelta(hours=1), show_spinner='Obtendo os dados...')
 def current_month_due(_collection: Collection, query) -> Cursor:
     tests_to_due = _collection.find(query, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1}).sort('Data da próxima realização', pymongo.DESCENDING)
     return tests_to_due
 
-@st.cache_data(ttl=timedelta(minutes=10), show_spinner='Obtendo os dados...')
+@st.cache_data(ttl=timedelta(hours=1), show_spinner='Obtendo os dados...')
 def current_month_done(_tests_to_due: Cursor, begin_period: datetime, end_period: datetime, _collection: Collection) -> Tuple[pd.DataFrame, list, list]:
     """
     Retrieves the tests that have been done in the current month.
