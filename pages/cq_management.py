@@ -96,7 +96,7 @@ with indicadores:
     tests_to_do_current_month, tests_done_current_month, tests_to_due_current_month = current_month_done(tests_to_due, begin_period, end_period, collection)
     
     # Verificar presença de materiais para realização dos testes
-    due_df = pd.DataFrame(tests_to_due_current_month, columns=['Equipamento', 'Nome'])
+    due_df = pd.DataFrame(tests_to_due_current_month)
     due_df['Sem material'] = False
     tests_to_do_current_month['Sem material'] = False
     with st.sidebar:

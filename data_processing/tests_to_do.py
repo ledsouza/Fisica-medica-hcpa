@@ -36,14 +36,8 @@ def current_month_done(tests_to_due: dict, begin_period: datetime, end_period: d
     tests_to_due_current_month = []
     tests_done_current_month = []
     for test in tests_to_due:
-        # Como estão ordenados por data da próxima realização, o primeiro teste de cada equipamento é o mais recente
-        # e o que está para vencer no mês corrente.
-        recent_to_due = (test['Equipamento'], test['Nome'])
-        if recent_to_due not in tests_to_due_current_month:
-            tests_to_due_current_month.append(recent_to_due) # Adiciona o teste que está para vencer no mês corrente
-        else:
-            continue
         data_da_proxima_realizacao = test.pop('Data da próxima realização') # Armazenar a data de realização prevista para o teste
+        tests_to_due_current_month.append(test)
         query = {
             "Data de realização": {
                 "$gte": begin_period,
