@@ -4,15 +4,14 @@ from menu import menu_with_redirect
 import os
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-import pymongo
 import pandas as pd
 import time
 from data_processing.stylized_table import StylizedCQ
 from data_processing.filters import filters_archivation, user_period_query
 from data_processing.plot_data import plot_indicadores
+from data_processing.tests_to_do import current_month_done, current_month_due
 from forms import FormMongoDB
 from datetime import datetime
-from tests_periodicity import TestsPeriodicity
 
 st.set_page_config(page_title="Gerência de Controle de Qualidade", layout="wide")
 # Open an image file
@@ -85,69 +84,17 @@ with indicadores:
         month = months[months_key]
     
     # Query para buscar os testes que estão para vencer
-    previous_year = year - 2
-    begin_period = datetime(previous_year, month, 1)
-    if month == 12:
-        end_period = datetime(year+1, 1, 1)
-    else:
-        end_period = datetime(year, month+1, 1)
+    begin_period = datetime(year, month, 1) - pd.DateOffset(year=1)
+    end_period = datetime(year, month, 1) + pd.DateOffset(months=1)
     query = {
         "Data da próxima realização": {
             "$gte": begin_period,
             "$lt": end_period
         }
     }
-    tests_to_due = collection.find(query, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1}).sort('Data da próxima realização', pymongo.DESCENDING)
-
-    # Query para buscar os testes que foram realizados no mês corrente
-    tests_to_do_current_month = pd.DataFrame()
-    tests_to_due_current_month = []
-    tests_done_current_month = []
-    for test in tests_to_due:
-        # Como estão ordenados por data da próxima realização, o primeiro teste de cada equipamento é o mais recente
-        # e o que está para vencer no mês corrente.
-        recent_to_due = (test['Equipamento'], test['Nome'])
-        if recent_to_due not in tests_to_due_current_month:
-            tests_to_due_current_month.append(recent_to_due) # Adiciona o teste que está para vencer no mês corrente
-        else:
-            continue
-        data_da_proxima_realizacao = test.pop('Data da próxima realização') # Armazenar a data de realização prevista para o teste
-        query = {
-            "Data de realização": {
-                "$gte": begin_period,
-                "$lt": end_period
-            },
-            **test
-        }
-        result = collection.find(query, {'_id': 0, 'Data da próxima realização': 0})
-        test_done = pd.DataFrame(list(result))
-        
-        if not test_done.empty:
-            # Ordenar os testes realizados por data de realização
-            # O teste mais recente é o primeiro da lista
-            test_done.sort_values(by='Data de realização', ascending=False, inplace=True)
-            test_done['Data da próxima realização'] = data_da_proxima_realizacao
-            test_done = test_done.iloc[[0]]
-            
-            # Verificar se o teste precisa ser realizado
-            tests_periodicity = TestsPeriodicity().full_list()
-            if tests_periodicity[test['Nome']] == 'Mensal':
-                test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=29)
-            elif tests_periodicity[test['Nome']] == 'Trimestral':
-                test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=91)
-            elif tests_periodicity[test['Nome']] == 'Semestral':
-                test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=182)
-            elif tests_periodicity[test['Nome']] == 'Anual':
-                test_done['is_expired'] = (test_done['Data da próxima realização'] - test_done['Data de realização']) >= pd.Timedelta(days=366)            
-            
-            # Adicionar o teste que precisa ser realizado no mês corrente
-            if test_done['is_expired'].values[0]:
-                test_done.drop(columns='is_expired', inplace=True)
-                tests_to_do_current_month = pd.concat([tests_to_do_current_month, test_done])
-            else:
-                tests_done_current_month.append(test_done.to_dict('records')[0])
-        else:
-            continue
+    
+    tests_to_due = current_month_due(collection, query)
+    tests_to_do_current_month, tests_done_current_month, tests_to_due_current_month = current_month_done(tests_to_due, begin_period, end_period, collection)
     
     # Verificar presença de materiais para realização dos testes
     due_df = pd.DataFrame(tests_to_due_current_month, columns=['Equipamento', 'Nome'])
@@ -219,13 +166,20 @@ with indicadores:
             total_archived -= 1
     indicador_arquivamento = total_archived / total_tests * 100
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric(label='Total de testes para realizar', value=f'{total_due}')
     with col2:
         st.metric(label='Indicador de Realização Total', value=f'{indicador_realizacao:.2f}%'.replace('.', ','))
     with col3:
         st.metric(label='Indicador de Arquivamento Total', value=f'{indicador_arquivamento:.2f}%'.replace('.', ','))
+    with col4:
+        def refresh_data():
+            current_month_due.clear()
+            current_month_done.clear()
+
+        st.markdown('<br>', unsafe_allow_html=True)
+        st.button('Atualizar dados', type='primary', key='update_cache', on_click=refresh_data)
 
     # Abas para exibir os indicadores de realização e arquivamento por equipamento com visualização de gráfica
     tab_realizacao, tab_arquivamento = st.tabs(['Realização por equipamento', 'Arquivamento por equipamento'])
