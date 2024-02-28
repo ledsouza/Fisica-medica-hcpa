@@ -109,46 +109,36 @@ with indicadores:
     df_tests_now = pd.DataFrame(list(tests_now))
     df_tests_now.drop_duplicates(subset=['Equipamento', 'Nome'], keep='first', inplace=True)
     
-    df_last_to_due_and_done = pd.merge(df_tests_to_due, df_tests_now, how='inner', on=['Equipamento', 'Nome'])
-    
     # Verificar se o teste precisa ser realizado
-    tests_periodicity = TestsPeriodicity().full_list()
-    undone_mensal = (df_last_to_due_and_done['Data da próxima realização'] - df_last_to_due_and_done['Data de realização']) >= pd.Timedelta(days=29)
-    undone_trimestral = (df_last_to_due_and_done['Data da próxima realização'] - df_last_to_due_and_done['Data de realização']) >= pd.Timedelta(days=91)
-    undone_semestral = (df_last_to_due_and_done['Data da próxima realização'] - df_last_to_due_and_done['Data de realização']) >= pd.Timedelta(days=182)
-    undone_anual = (df_last_to_due_and_done['Data da próxima realização'] - df_last_to_due_and_done['Data de realização']) >= pd.Timedelta(days=366)
-    df_last_to_due_and_done['not_done'] = True
+    def get_tests_need_to_do(df_tests_to_due, df_tests_now):
+        df_last_to_due_and_done = pd.merge(df_tests_to_due, df_tests_now, how='inner', on=['Equipamento', 'Nome'])
+        tests_periodicity = TestsPeriodicity().full_list()
+        df_last_to_due_and_done['not_done'] = True
+        
+        def get_keys_by_value(dict_obj, value):
+            return [k for k, v in dict_obj.items() if v == value]
+        
+        monthyl_tests = get_keys_by_value(tests_periodicity, 'Mensal')
+        trimestral_tests = get_keys_by_value(tests_periodicity, 'Trimestral')
+        semestral_tests = get_keys_by_value(tests_periodicity, 'Semestral')
+        anual_tests = get_keys_by_value(tests_periodicity, 'Anual')
+        
+        df_undone_monthly = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(monthyl_tests)].index, :]
+        df_undone_monthly['not_done'] = df_undone_monthly['Data da próxima realização'] - df_undone_monthly['Data de realização'] >= pd.Timedelta(days=29)
+        df_undone_trimestral = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(trimestral_tests)].index, :]
+        df_undone_trimestral['not_done'] = df_undone_trimestral['Data da próxima realização'] - df_undone_trimestral['Data de realização'] >= pd.Timedelta(days=91)
+        df_undone_semestral = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(semestral_tests)].index, :]
+        df_undone_semestral['not_done'] = df_undone_semestral['Data da próxima realização'] - df_undone_semestral['Data de realização'] >= pd.Timedelta(days=182)
+        df_undone_anual = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(anual_tests)].index, :]
+        df_undone_anual['not_done'] = df_undone_anual['Data da próxima realização'] - df_undone_anual['Data de realização'] >= pd.Timedelta(days=366)
+        
+        df_last_to_due_and_done = pd.concat([df_undone_monthly, df_undone_trimestral, df_undone_semestral, df_undone_anual])
+        
+        return df_last_to_due_and_done
     
-    def get_keys_by_value(dict_obj, value):
-        return [k for k, v in dict_obj.items() if v == value]
+    df_last_to_due_and_done = get_tests_need_to_do(df_tests_to_due, df_tests_now)
     
-    monthyl_tests = get_keys_by_value(tests_periodicity, 'Mensal')
-    trimestral_tests = get_keys_by_value(tests_periodicity, 'Trimestral')
-    semestral_tests = get_keys_by_value(tests_periodicity, 'Semestral')
-    anual_tests = get_keys_by_value(tests_periodicity, 'Anual')
-    
-    df_undone_monthly = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(monthyl_tests)].index, :]
-    df_undone_monthly['not_done'] = df_undone_monthly['Data da próxima realização'] - df_undone_monthly['Data de realização'] >= pd.Timedelta(days=29)
-    df_undone_trimestral = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(trimestral_tests)].index, :]
-    df_undone_trimestral['not_done'] = df_undone_trimestral['Data da próxima realização'] - df_undone_trimestral['Data de realização'] >= pd.Timedelta(days=91)
-    df_undone_semestral = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(semestral_tests)].index, :]
-    df_undone_semestral['not_done'] = df_undone_semestral['Data da próxima realização'] - df_undone_semestral['Data de realização'] >= pd.Timedelta(days=182)
-    df_undone_anual = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(anual_tests)].index, :]
-    df_undone_anual['not_done'] = df_undone_anual['Data da próxima realização'] - df_undone_anual['Data de realização'] >= pd.Timedelta(days=366)
-    
-    df_last_to_due_and_done = pd.concat([df_undone_monthly, df_undone_trimestral, df_undone_semestral, df_undone_anual])
-    
-    st.dataframe(df_last_to_due_and_done)
-    
-    # if tests_periodicity[df_last_to_due_and_done['Nome'].values[0]] == 'Mensal':
-    #     df_last_to_due_and_done['not_done'] = (df_last_to_due_and_done['Data da próxima realização'] - df_last_to_due_and_done['Data de realização']) >= pd.Timedelta(days=29)
-    # elif tests_periodicity[df_last_to_due_and_done['Nome']] == 'Trimestral':
-    #     df_last_to_due_and_done['not_done'] = (df_last_to_due_and_done['Data da próxima realização'] - df_last_to_due_and_done['Data de realização']) >= pd.Timedelta(days=91)
-    # elif tests_periodicity[df_last_to_due_and_done['Nome']] == 'Semestral':
-    #     df_last_to_due_and_done['not_done'] = (df_last_to_due_and_done['Data da próxima realização'] - df_last_to_due_and_done['Data de realização']) >= pd.Timedelta(days=182)
-    # elif tests_periodicity[df_last_to_due_and_done['Nome']] == 'Anual':
-    #     df_last_to_due_and_done['not_done'] = (df_last_to_due_and_done['Data da próxima realização'] - df_last_to_due_and_done['Data de realização']) >= pd.Timedelta(days=366)  
-    
+    st.dataframe(df_last_to_due_and_done.query('not_done == True').drop(columns=['not_done']), hide_index=True, use_container_width=True)
     
     # tests_to_do_current_month, tests_done_current_month, tests_to_due_current_month = current_month_done(tests_to_due, begin_period, end_period, collection)
     
