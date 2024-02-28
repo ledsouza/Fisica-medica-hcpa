@@ -12,6 +12,7 @@ from data_processing.plot_data import plot_indicadores
 from data_processing.tests_to_do import current_month_done, current_month_due
 from forms import FormMongoDB
 from datetime import datetime
+import pymongo
 
 st.set_page_config(page_title="Gerência de Controle de Qualidade", layout="wide")
 # Open an image file
@@ -92,7 +93,22 @@ with indicadores:
             "$lt": end_period
         }
     }
-    tests_to_due = current_month_due(collection, query)
+    df_tests_to_due = current_month_due(collection, query)
+    
+    end_period = datetime.now()
+    query = {
+        "Data de realização": {
+            "$gte": begin_period,
+            "$lt": end_period
+        }
+    }
+    tests_now = collection.find(query, {'_id': 0, 'Data da próxima realização': 0}).sort('Data de realização', pymongo.DESCENDING)
+    df_tests_now = pd.DataFrame(list(tests_now))
+    df_tests_now.drop_duplicates(subset=['Equipamento', 'Nome'], keep='first', inplace=True)
+    
+    merged_df = pd.merge(df_tests_to_due, df_tests_now, how='inner', on=['Equipamento', 'Nome'])
+    st.dataframe(merged_df.sort_values(by=['Equipamento', 'Nome']))
+    
     # tests_to_do_current_month, tests_done_current_month, tests_to_due_current_month = current_month_done(tests_to_due, begin_period, end_period, collection)
     
     # # Verificar presença de materiais para realização dos testes
