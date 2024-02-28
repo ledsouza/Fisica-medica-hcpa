@@ -8,12 +8,11 @@ from typing import Tuple
 import streamlit as st
 
 @st.cache_data(ttl=timedelta(hours=1), show_spinner='Obtendo os dados...')
-def current_month_due(_collection: Collection, query) -> dict:
+def current_month_due(_collection: Collection, query) -> pd.DataFrame:
     tests_to_due = _collection.find(query, {'_id': 0, 'Equipamento': 1, 'Nome': 1, 'Data da próxima realização': 1}).sort('Data da próxima realização', pymongo.DESCENDING)
     df_tests_to_due = pd.DataFrame(list(tests_to_due))
     df_tests_to_due.drop_duplicates(subset=['Equipamento', 'Nome'], keep='first', inplace=True)
-    tests_to_due = df_tests_to_due.to_dict('records')
-    return tests_to_due
+    return df_tests_to_due
 
 @st.cache_data(ttl=timedelta(hours=1), show_spinner='Obtendo os dados...')
 def current_month_done(tests_to_due: dict, begin_period: datetime, end_period: datetime, _collection: Collection) -> Tuple[pd.DataFrame, list, list]:
