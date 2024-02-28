@@ -6,10 +6,10 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import pandas as pd
 import time
-from data_processing.stylized_table import StylizedCQ
+from data_processing.stylized_table import StylizedCQ, styled_tests_need_to_do
 from data_processing.filters import filters_archivation, user_period_query
 from data_processing.plot_data import plot_indicadores
-from data_processing.tests_to_do import current_month_done, current_month_due
+from data_processing.indicadores import current_month_due, current_month_done, get_tests_need_to_do, check_materials, calculate_indicadores
 from forms import FormMongoDB
 from datetime import datetime
 import pymongo
@@ -102,105 +102,13 @@ with indicadores:
             "$lt": end_period
         }
     }
-    tests_now = collection.find(query, {'_id': 0, 'Data da próxima realização': 0}).sort('Data de realização', pymongo.DESCENDING)
-    df_tests_now = pd.DataFrame(list(tests_now))
-    df_tests_now.drop_duplicates(subset=['Equipamento', 'Nome'], keep='first', inplace=True)
-    
-    # Obter os testes que precisam ser realizados
-    def get_tests_need_to_do(df_tests_to_due, df_tests_now):
-        df_last_to_due_and_done = pd.merge(df_tests_to_due, df_tests_now, how='inner', on=['Equipamento', 'Nome'])
-        tests_periodicity = TestsPeriodicity().full_list()
-        df_last_to_due_and_done['not_done'] = True
-        
-        def get_keys_by_value(dict_obj, value):
-            return [k for k, v in dict_obj.items() if v == value]
-        
-        monthyl_tests = get_keys_by_value(tests_periodicity, 'Mensal')
-        trimestral_tests = get_keys_by_value(tests_periodicity, 'Trimestral')
-        semestral_tests = get_keys_by_value(tests_periodicity, 'Semestral')
-        anual_tests = get_keys_by_value(tests_periodicity, 'Anual')
-        
-        df_undone_monthly = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(monthyl_tests)].index, :]
-        df_undone_monthly['not_done'] = df_undone_monthly['Data da próxima realização'] - df_undone_monthly['Data de realização'] >= pd.Timedelta(days=29)
-        df_undone_trimestral = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(trimestral_tests)].index, :]
-        df_undone_trimestral['not_done'] = df_undone_trimestral['Data da próxima realização'] - df_undone_trimestral['Data de realização'] >= pd.Timedelta(days=91)
-        df_undone_semestral = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(semestral_tests)].index, :]
-        df_undone_semestral['not_done'] = df_undone_semestral['Data da próxima realização'] - df_undone_semestral['Data de realização'] >= pd.Timedelta(days=182)
-        df_undone_anual = df_last_to_due_and_done.iloc[df_last_to_due_and_done[df_last_to_due_and_done['Nome'].isin(anual_tests)].index, :]
-        df_undone_anual['not_done'] = df_undone_anual['Data da próxima realização'] - df_undone_anual['Data de realização'] >= pd.Timedelta(days=366)
-        
-        df_last_to_due_and_done = pd.concat([df_undone_monthly, df_undone_trimestral, df_undone_semestral, df_undone_anual])
-        
-        return df_last_to_due_and_done
-    
+    df_tests_now = current_month_done(collection, query)
     df_tests_need_to_do = get_tests_need_to_do(df_tests_to_due, df_tests_now)
     
     # Verificar presença de materiais para realização dos testes
-    def check_materials(df_tests_need_to_do):
-        df_tests_need_to_do['Sem material'] = False
-        with st.sidebar:
-            st.markdown('Materiais ausentes para realização dos testes:')
-            materials = {}
-            materials['Ga-67'] = st.toggle('Ga-67', value=True)
-            materials['Tl-201'] = st.toggle('Tl-201', value=True)
-            materials['I-131'] = st.toggle('I-131', value=False)
-        
-        if materials['Ga-67'] and materials['Tl-201'] and materials['I-131']:
-            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x or 'I-131' in x else False)
-
-        if materials['Ga-67'] and materials['Tl-201'] and not materials['I-131']:
-            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x else False)
-
-        if materials['Ga-67'] and not materials['Tl-201'] and materials['I-131']:
-            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Ga-67' in x or 'I-131' in x else False)
-
-        if not materials['Ga-67'] and materials['Tl-201'] and materials['I-131']:
-            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Tl-201' in x or 'I-131' in x else False)
-
-        if materials['Ga-67'] and not materials['Tl-201'] and not materials['I-131']:
-            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Ga-67' in x else False)
-
-        if not materials['Ga-67'] and materials['Tl-201'] and not materials['I-131']:
-            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Tl-201' in x else False)
-
-        if not materials['Ga-67'] and not materials['Tl-201'] and materials['I-131']:
-            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'I-131' in x else False)
-            
-        return df_tests_need_to_do
-    
     df_tests_need_to_do = check_materials(df_tests_need_to_do)
     
-    # Formatar o dataframe para exibição
-    def styled_tests_need_to_do(dataframe):
-        tests_to_do_current_month = dataframe.query('not_done == True').drop(columns=['not_done'])
-        if not tests_to_do_current_month.empty:
-            tests_to_do_current_month.rename(columns={'Data de realização': 'Data da última realização', 'Data da próxima realização': 'Data de realização esperada'}, inplace=True)
-            tests_to_do_current_month.sort_values(by=['Sem material','Data de realização esperada'], inplace=True)
-            s_tests_to_do_current_month = tests_to_do_current_month.drop(columns='Arquivado').style
-            s_tests_to_do_current_month.format(
-                {
-                    'Data da última realização': '{:%d/%m/%Y}',
-                    'Data de realização esperada': '{:%d/%m/%Y}'
-                }
-            )
-            
-            # Exibir os testes que estão para vencer no mês corrente
-            st.dataframe(s_tests_to_do_current_month, hide_index=True, use_container_width=True)
-        else:
-            st.success('Todos os testes realizados!')
-            
     styled_tests_need_to_do(df_tests_need_to_do)
-    
-    def calculate_indicadores(df_tests_need_to_do: pd.DataFrame) -> tuple:
-        total = df_tests_need_to_do.query('`Sem material` == False').shape[0]
-        total_done = df_tests_need_to_do.query('not_done == False and `Sem material` == False').shape[0]
-        total_to_do = total - total_done
-        indicador_realizacao = total_done / total * 100
-        
-        total_done_and_archived = df_tests_need_to_do.query('not_done == False and `Sem material` == False and Arquivado == True').shape[0]
-        indicador_arquivado = total_done_and_archived / total * 100
-        
-        return (indicador_realizacao, indicador_arquivado, total_to_do)
     
     indicador_realizacao, indicador_arquivamento, total_to_do = calculate_indicadores(df_tests_need_to_do)
     
@@ -215,6 +123,7 @@ with indicadores:
         def refresh_data():
             current_month_due.clear()
             current_month_done.clear()
+            get_tests_need_to_do.clear()
 
         st.markdown('<br>', unsafe_allow_html=True)
         st.button('Atualizar dados', type='primary', key='update_cache', on_click=refresh_data)
