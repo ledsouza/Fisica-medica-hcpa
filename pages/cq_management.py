@@ -84,8 +84,6 @@ with indicadores:
         current_month = datetime.now().month
         months_key = st.selectbox('Selecione o mês', months.keys(), index=(current_month - 1))
         month = months[months_key]
-        
-    selected_period = datetime(year, month, 1) + pd.DateOffset(months=1)
     
     # Query para buscar os testes que estão para vencer
     begin_period = datetime(year, month, 1) - pd.DateOffset(year=1)
@@ -98,7 +96,6 @@ with indicadores:
     }
     df_tests_to_due = current_month_due(collection, query)
     
-    end_period = datetime.now()
     query = {
         "Data de realização": {
             "$gte": begin_period,
@@ -109,7 +106,7 @@ with indicadores:
     df_tests_now = pd.DataFrame(list(tests_now))
     df_tests_now.drop_duplicates(subset=['Equipamento', 'Nome'], keep='first', inplace=True)
     
-    # Verificar se o teste precisa ser realizado
+    # Obter os testes que precisam ser realizados
     def get_tests_need_to_do(df_tests_to_due, df_tests_now):
         df_last_to_due_and_done = pd.merge(df_tests_to_due, df_tests_now, how='inner', on=['Equipamento', 'Nome'])
         tests_periodicity = TestsPeriodicity().full_list()
@@ -136,111 +133,106 @@ with indicadores:
         
         return df_last_to_due_and_done
     
-    df_last_to_due_and_done = get_tests_need_to_do(df_tests_to_due, df_tests_now)
+    df_tests_need_to_do = get_tests_need_to_do(df_tests_to_due, df_tests_now)
     
-    st.dataframe(df_last_to_due_and_done.query('not_done == True').drop(columns=['not_done']), hide_index=True, use_container_width=True)
-    
-    # tests_to_do_current_month, tests_done_current_month, tests_to_due_current_month = current_month_done(tests_to_due, begin_period, end_period, collection)
-    
-    # # Verificar presença de materiais para realização dos testes
-    # due_df = pd.DataFrame(tests_to_due_current_month)
-    # due_df['Sem material'] = False
-    # tests_to_do_current_month['Sem material'] = False
-    # with st.sidebar:
-    #     st.markdown('Materiais ausentes para realização dos testes:')
-    #     materials = {}
-    #     materials['Ga-67'] = st.toggle('Ga-67', value=True)
-    #     materials['Tl-201'] = st.toggle('Tl-201', value=True)
-    #     materials['I-131'] = st.toggle('I-131', value=False)
-    
-    # if materials['Ga-67'] and materials['Tl-201'] and materials['I-131']:
-    #     tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x or 'I-131' in x else False)
-    #     due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x or 'I-131' in x else False)
-
-    # if materials['Ga-67'] and materials['Tl-201'] and not materials['I-131']:
-    #     tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x else False)
-    #     due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x else False)
-
-    # if materials['Ga-67'] and not materials['Tl-201'] and materials['I-131']:
-    #     tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x or 'I-131' in x else False)
-    #     due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Ga-67' in x or 'I-131' in x else False)
-
-    # if not materials['Ga-67'] and materials['Tl-201'] and materials['I-131']:
-    #     tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Tl-201' in x or 'I-131' in x else False)
-    #     due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Tl-201' in x or 'I-131' in x else False)
-
-    # if materials['Ga-67'] and not materials['Tl-201'] and not materials['I-131']:
-    #     tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Ga-67' in x else False)
-    #     due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Ga-67' in x else False)
-
-    # if not materials['Ga-67'] and materials['Tl-201'] and not materials['I-131']:
-    #     tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'Tl-201' in x else False)
-    #     due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'Tl-201' in x else False)
-
-    # if not materials['Ga-67'] and not materials['Tl-201'] and materials['I-131']:
-    #     tests_to_do_current_month['Sem material'] = tests_to_do_current_month['Nome'].apply(lambda x: True if 'I-131' in x else False)
-    #     due_df['Sem material'] = due_df['Nome'].apply(lambda x: True if 'I-131' in x else False)
-    
-    # # Formatar o dataframe para exibição
-    # if not tests_to_do_current_month.empty:
-    #     tests_to_do_current_month.rename(columns={'Data de realização': 'Data da última realização', 'Data da próxima realização': 'Data de realização esperada'}, inplace=True)
-    #     tests_to_do_current_month.sort_values(by=['Sem material','Data de realização esperada'], inplace=True)
-    #     s_tests_to_do_current_month = tests_to_do_current_month.drop(columns='Arquivado').style
-    #     s_tests_to_do_current_month.format(
-    #         {
-    #             'Data da última realização': '{:%d/%m/%Y}',
-    #             'Data de realização esperada': '{:%d/%m/%Y}'
-    #         }
-    #     )
+    # Verificar presença de materiais para realização dos testes
+    def check_materials(df_tests_need_to_do):
+        df_tests_need_to_do['Sem material'] = False
+        with st.sidebar:
+            st.markdown('Materiais ausentes para realização dos testes:')
+            materials = {}
+            materials['Ga-67'] = st.toggle('Ga-67', value=True)
+            materials['Tl-201'] = st.toggle('Tl-201', value=True)
+            materials['I-131'] = st.toggle('I-131', value=False)
         
-    #     # Exibir os testes que estão para vencer no mês corrente
-    #     st.dataframe(s_tests_to_do_current_month, hide_index=True, use_container_width=True)
-    # else:
-    #     st.success('Todos os testes realizados!')
+        if materials['Ga-67'] and materials['Tl-201'] and materials['I-131']:
+            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x or 'I-131' in x else False)
 
-    # # Calcular os indicadores
-    # total_done = len(tests_done_current_month)
-    # mask = (tests_to_do_current_month['Sem material'] == False) 
-    # total_due = len(tests_to_do_current_month[mask])
-    # total_tests = due_df[due_df['Sem material'] == False].shape[0]
+        if materials['Ga-67'] and materials['Tl-201'] and not materials['I-131']:
+            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Ga-67' in x or 'Tl-201' in x else False)
+
+        if materials['Ga-67'] and not materials['Tl-201'] and materials['I-131']:
+            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Ga-67' in x or 'I-131' in x else False)
+
+        if not materials['Ga-67'] and materials['Tl-201'] and materials['I-131']:
+            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Tl-201' in x or 'I-131' in x else False)
+
+        if materials['Ga-67'] and not materials['Tl-201'] and not materials['I-131']:
+            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Ga-67' in x else False)
+
+        if not materials['Ga-67'] and materials['Tl-201'] and not materials['I-131']:
+            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'Tl-201' in x else False)
+
+        if not materials['Ga-67'] and not materials['Tl-201'] and materials['I-131']:
+            df_tests_need_to_do['Sem material'] = df_tests_need_to_do['Nome'].apply(lambda x: True if 'I-131' in x else False)
+            
+        return df_tests_need_to_do
+    
+    df_tests_need_to_do = check_materials(df_tests_need_to_do)
+    
+    # Formatar o dataframe para exibição
+    def styled_tests_need_to_do(dataframe):
+        tests_to_do_current_month = dataframe.query('not_done == True').drop(columns=['not_done'])
+        if not tests_to_do_current_month.empty:
+            tests_to_do_current_month.rename(columns={'Data de realização': 'Data da última realização', 'Data da próxima realização': 'Data de realização esperada'}, inplace=True)
+            tests_to_do_current_month.sort_values(by=['Sem material','Data de realização esperada'], inplace=True)
+            s_tests_to_do_current_month = tests_to_do_current_month.drop(columns='Arquivado').style
+            s_tests_to_do_current_month.format(
+                {
+                    'Data da última realização': '{:%d/%m/%Y}',
+                    'Data de realização esperada': '{:%d/%m/%Y}'
+                }
+            )
+            
+            # Exibir os testes que estão para vencer no mês corrente
+            st.dataframe(s_tests_to_do_current_month, hide_index=True, use_container_width=True)
+        else:
+            st.success('Todos os testes realizados!')
+            
+    styled_tests_need_to_do(df_tests_need_to_do)
+    
+    def calculate_indicadores(df_tests_need_to_do: pd.DataFrame) -> tuple:
+        total = df_tests_need_to_do.query('`Sem material` == False').shape[0]
+        total_done = df_tests_need_to_do.query('not_done == False and `Sem material` == False').shape[0]
+        total_to_do = total - total_done
+        indicador_realizacao = total_done / total * 100
         
-    # indicador_realizacao = total_done / (total_tests) * 100
+        total_done_and_archived = df_tests_need_to_do.query('not_done == False and `Sem material` == False and Arquivado == True').shape[0]
+        indicador_arquivado = total_done_and_archived / total * 100
+        
+        return (indicador_realizacao, indicador_arquivado, total_to_do)
     
-    # total_archived = total_done
-    # for test in tests_done_current_month:
-    #     if not test['Arquivado']:
-    #         total_archived -= 1
-    # indicador_arquivamento = total_archived / total_tests * 100
+    indicador_realizacao, indicador_arquivamento, total_to_do = calculate_indicadores(df_tests_need_to_do)
     
-    # col1, col2, col3, col4 = st.columns(4)
-    # with col1:
-    #     st.metric(label='Total de testes para realizar', value=f'{total_due}')
-    # with col2:
-    #     st.metric(label='Indicador de Realização Total', value=f'{indicador_realizacao:.2f}%'.replace('.', ','))
-    # with col3:
-    #     st.metric(label='Indicador de Arquivamento Total', value=f'{indicador_arquivamento:.2f}%'.replace('.', ','))
-    # with col4:
-    #     def refresh_data():
-    #         current_month_due.clear()
-    #         current_month_done.clear()
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric(label='Total de testes para realizar', value=f'{total_to_do}')
+    with col2:
+        st.metric(label='Indicador de Realização Total', value=f'{indicador_realizacao:.2f}%'.replace('.', ','))
+    with col3:
+        st.metric(label='Indicador de Arquivamento Total', value=f'{indicador_arquivamento:.2f}%'.replace('.', ','))
+    with col4:
+        def refresh_data():
+            current_month_due.clear()
+            current_month_done.clear()
 
-    #     st.markdown('<br>', unsafe_allow_html=True)
-    #     st.button('Atualizar dados', type='primary', key='update_cache', on_click=refresh_data)
+        st.markdown('<br>', unsafe_allow_html=True)
+        st.button('Atualizar dados', type='primary', key='update_cache', on_click=refresh_data)
+        
+    done_df = df_tests_need_to_do.query('not_done == False and `Sem material` == False')[['Equipamento', 'Nome', 'Arquivado']]
+    due_df = df_tests_need_to_do.query('`Sem material` == False')[['Equipamento', 'Nome', 'Arquivado']]
 
-    # # Abas para exibir os indicadores de realização e arquivamento por equipamento com visualização de gráfica
-    # tab_realizacao, tab_arquivamento = st.tabs(['Realização por equipamento', 'Arquivamento por equipamento'])
-    # done_df = pd.DataFrame(tests_done_current_month)
-    # done_df = done_df[['Equipamento', 'Nome', 'Arquivado']]
-    # due_df = due_df[due_df['Sem material'] == False]
+    # Abas para exibir os indicadores de realização e arquivamento por equipamento com visualização de gráfica
+    tab_realizacao, tab_arquivamento = st.tabs(['Realização por equipamento', 'Arquivamento por equipamento'])
     
-    # # Indicador de realização por equipamento
-    # with tab_realizacao:
-    #     plot_indicadores(done_df, due_df, indicador='realizados', month=months_key, year=year)
+    # Indicador de realização por equipamento
+    with tab_realizacao:
+        plot_indicadores(done_df, due_df, indicador='realizados', month=months_key, year=year)
 
-    # # Indicador de arquivamento por equipamento
-    # with tab_arquivamento:
-    #     archived_df = done_df[done_df['Arquivado'] == True]
-    #     plot_indicadores(archived_df, due_df, indicador='arquivados', month=months_key, year=year)
+    # Indicador de arquivamento por equipamento
+    with tab_arquivamento:
+        archived_df = done_df[done_df['Arquivado'] == True]
+        plot_indicadores(archived_df, due_df, indicador='arquivados', month=months_key, year=year)
 
 # Arquivamento de testes
 if 'teste_archivation' not in st.session_state:
