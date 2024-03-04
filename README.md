@@ -1,10 +1,10 @@
-# Aplicativo Web para Gestão do Serviço de Física Médica em Medicina Nuclear
+# Aplicativo Web para Gestão do Serviço de Física Médica em Medicina Nuclear do HCPA
 
-Aplicativo desenvolvido para gestão e análise de dados do Serviço de Física Médica em Medicina Nuclear
+Aplicativo desenvolvido para gestão e análise de dados do Serviço de Física Médica em Medicina Nuclear do HCPA
 
 | :books: Vitrine.Dev |     |
 | -------------  | --- |
-| :sparkles: Nome        | **Aplicativo Web para Gestão do Serviço de Física Médica em Medicina Nuclear**
+| :sparkles: Nome        | **Aplicativo Web para Gestão do Serviço de Física Médica em Medicina Nuclear do HCPA**
 | :label: Tecnologias | python, dotenv, pandas, plotly, numpy, pymongo, streamlit, yaml, boto3, terraform, docker, aws, gcp
 | :rocket: URL         | [MNManagement](https://mnmanagement-xnb7n2zcnq-uc.a.run.app)
 
