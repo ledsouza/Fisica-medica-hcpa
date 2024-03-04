@@ -22,7 +22,7 @@ O aplicativo atualmente possui 3 funcionalidades principais:
      - Registrar novos usuários
      - Remover usuários
      - Atualizar detalhes do usuário
-     - Registrar ou remover testes no banco de dados
+     - Registrar, remover ou editar testes no banco de dados
 
 ### 2. Tratamento e Análise de Dados do PACS:
    - Os usuários podem importar dados do PACS para processamento e análise.
