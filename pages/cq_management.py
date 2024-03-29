@@ -22,7 +22,7 @@ st.sidebar.image(img, use_column_width=True)
 
 menu_with_redirect()
 
-uri = f"mongodb+srv://ledsouza:{os.getenv('MONGODB_PASSWORD')}@mnmanagement.opks2ne.mongodb.net/?retryWrites=true&w=majority"
+uri = f"mongodb+srv://ledsouza:{st.secrets['MONGODB_PASSWORD']}@mnmanagement.opks2ne.mongodb.net/?retryWrites=true&w=majority"
 
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'), maxIdleTimeMS=60000*10)
