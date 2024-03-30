@@ -14,6 +14,11 @@ credentials:
       logged_in: false
       name: Fernanda Ramos de Oliveira
       password: $2b$12$B1I39cz4iCDXHAVu9vhUEOOZE64c6QuESGag8QHt5NcGxOZnql1v.
+    grgarcia:
+      email: grgarcia@hcpa.edu.br
+      logged_in: false
+      name: Guilherme
+      password: $2b$12$eTJTdZmPo6eKsbvSob3TEuNKIlB/IUgCCtPrpFyo5YCma5N5qHI9e
     jbsalazar:
       email: jbsalazar@hcpa.edu.br
       logged_in: false
@@ -29,6 +34,11 @@ credentials:
       logged_in: true
       name: Leandro da Silva de Souza
       password: $2b$12$n0pLYqh/6rbGnP8EOZwUu.wimJuW0MOlZYjOLasUu2IKXX2XjJlOG
+    rhann:
+      email: rhann@hcpa.edu.br
+      logged_in: false
+      name: Rodrigo
+      password: $2b$12$lntybVv/PY3UObw7HhYdLOXHIdxt95buq7Wizi2XfojJYr.UrIhfi
 preauthorized:
   emails:
   - jbsalazar@hcpa.edu.br

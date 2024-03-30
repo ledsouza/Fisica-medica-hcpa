@@ -1,19 +1,18 @@
-import streamlit as st
-from PIL import Image
-from menu import menu_with_redirect
-import os
+import time
+from datetime import datetime
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+import streamlit as st
+from PIL import Image
 import pandas as pd
-import time
+
+from menu import menu_with_redirect
 from data_processing.stylized_table import StylizedCQ, styled_tests_need_to_do
 from data_processing.filters import filters_archivation, user_period_query
 from data_processing.plot_data import plot_indicadores
 from data_processing.indicadores import current_month_due, current_month_done, get_tests_need_to_do, check_materials, calculate_indicadores
 from forms import FormMongoDB
-from datetime import datetime
-import pymongo
-from tests_periodicity import TestsPeriodicity
+
 
 st.set_page_config(page_title="Gerência de Controle de Qualidade", layout="wide")
 # Open an image file
@@ -22,7 +21,7 @@ st.sidebar.image(img, use_column_width=True)
 
 menu_with_redirect()
 
-uri = f"mongodb+srv://ledsouza:{os.getenv('MONGODB_PASSWORD')}@mnmanagement.opks2ne.mongodb.net/?retryWrites=true&w=majority"
+uri = f"mongodb+srv://ledsouza:{st.secrets['MONGODB_PASSWORD']}@mnmanagement.opks2ne.mongodb.net/?retryWrites=true&w=majority"
 
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'), maxIdleTimeMS=60000*10)
