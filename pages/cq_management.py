@@ -10,7 +10,7 @@ from menu import menu_with_redirect
 from data_processing.stylized_table import StylizedCQ, styled_tests_need_to_do
 from data_processing.filters import filters_archivation, user_period_query
 from data_processing.plot_data import plot_indicadores
-from data_processing.indicadores import current_month_due, current_month_done, get_tests_need_to_do, check_materials, calculate_indicadores
+from data_processing.indicadores import Indicadores
 from forms import FormMongoDB
 
 
@@ -93,7 +93,9 @@ with indicadores:
             "$lt": end_period
         }
     }
-    df_tests_to_due = current_month_due(collection, query)
+
+    indicadores_class = Indicadores(client, collection)
+    df_tests_to_due = indicadores_class.current_month_due(query)
     
     query = {
         "Data de realização": {
@@ -101,15 +103,15 @@ with indicadores:
             "$lt": end_period
         }
     }
-    df_tests_now = current_month_done(collection, query)
-    df_tests_need_to_do = get_tests_need_to_do(df_tests_to_due, df_tests_now)
+    df_tests_now = indicadores_class.current_month_done(query)
+    df_tests_need_to_do = indicadores_class.get_tests_need_to_do(df_tests_to_due, df_tests_now)
     
     # Verificar presença de materiais para realização dos testes
-    df_tests_need_to_do = check_materials(df_tests_need_to_do)
+    df_tests_need_to_do = indicadores_class.check_materials(df_tests_need_to_do)
     
     styled_tests_need_to_do(df_tests_need_to_do)
     
-    indicador_realizacao, indicador_arquivamento, total_to_do = calculate_indicadores(df_tests_need_to_do)
+    indicador_realizacao, indicador_arquivamento, total_to_do = indicadores_class.calculate_indicadores(df_tests_need_to_do)
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -120,9 +122,9 @@ with indicadores:
         st.metric(label='Indicador de Arquivamento Total', value=f'{indicador_arquivamento:.2f}%'.replace('.', ','))
     with col4:
         def refresh_data():
-            current_month_due.clear()
-            current_month_done.clear()
-            get_tests_need_to_do.clear()
+            indicadores_class.current_month_due.clear()
+            indicadores_class.current_month_done.clear()
+            indicadores_class.get_tests_need_to_do.clear()
 
         st.markdown('<br>', unsafe_allow_html=True)
         st.button('Atualizar dados', type='primary', key='update_cache', on_click=refresh_data)
