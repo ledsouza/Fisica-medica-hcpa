@@ -6,7 +6,7 @@ Aplicativo desenvolvido para gestão e análise de dados do Serviço de Física 
 | -------------  | --- |
 | :sparkles: Nome        | **Aplicativo Web para Gestão do Serviço de Física Médica em Medicina Nuclear do HCPA**
 | :label: Tecnologias | python, dotenv, pandas, plotly, numpy, pymongo, streamlit, yaml, boto3, terraform, docker, aws, gcp
-| :rocket: URL         | [MNManagement](https://mnmanagement-xnb7n2zcnq-uc.a.run.app)
+| :rocket: URL         | [MN Business Intelligence](https://fmmn-bi.streamlit.app/)
 
 <!-- Inserir imagem com a #vitrinedev ao final do link -->
 ![](https://vitrinedev.s3.amazonaws.com/fmmnmanagement.png#vitrinedev)
